@@ -175,7 +175,30 @@ function readCSV(){
       rows++;
 
       const d = distKm(HK_LAT, HK_LON, lat, lon);
+      if(d < t.closest){
+  t.closest = d;
+  t.time = validTime;
+}
 
+if(wind > t.maxWind){
+  t.maxWind = wind;
+}
+
+if(pressure < t.minPressure){
+  t.minPressure = pressure;
+}
+
+if(r34 > t.maxR34){
+  t.maxR34 = r34;
+}
+
+if(r50 > t.maxR50){
+  t.maxR50 = r50;
+}
+
+if(r64 > t.maxR64){
+  t.maxR64 = r64;
+}
       if(!trackMap.has(sample)){
         trackMap.set(sample,{
           sample,
