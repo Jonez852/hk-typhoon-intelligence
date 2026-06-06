@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HK Typhoon Intelligence V3</title>
+<style>
+body{font-family:Arial;background:#0f172a;color:white;padding:20px}
+h1{text-align:center;font-size:32px}
+.card{background:#1e293b;padding:18px;border-radius:14px;margin-bottom:18px}
+button{width:100%;padding:14px;margin-top:12px;background:#2563eb;color:white;border:0;border-radius:10px;font-size:18px;font-weight:bold}
+input{width:100%;padding:10px}
+.result{font-size:21px;font-weight:bold;margin:11px 0}
+.small{font-size:14px;color:#cbd5e1;line-height:1.4}
+.low{color:#22c55e}.mid{color:#facc15}.high{color:#fb923c}.danger{color:#ef4444}.extreme{color:#c084fc}
+textarea{width:100%;height:190px;background:#020617;color:white;border:1px solid #334155;border-radius:10px;padding:10px;font-size:15px}
+</style>
+</head>
+<body>
+
+<h1>🌪 HK Typhoon Intelligence V3</h1>
+
+<div class="card">
+<h2>Upload FNV3 Ensemble CSV</h2>
+<input type="file" id="csvFile" accept=".csv">
+<button onclick="readCSV()">Analyze HKO-style Signal Risk</button>
+<p class="small">AI estimate only. Not official HKO warning.</p>
+</div>
+
+<div class="card">
+<h2>HKO-style Signal Risk</h2>
+<div class="result">Status: <span id="status">Waiting</span></div>
+<div class="result">Overall Risk: <span id="overall">-</span></div>
+<div class="result">T1 Risk: <span id="t1">0%</span></div>
+<div class="result">T3 Risk: <span id="t3">0%</span></div>
+<div class="result">T8 Risk: <span id="t8">0%</span></div>
+<div class="result">T9 Risk: <span id="t9">0%</span></div>
+<div class="result">T10 Risk: <span id="t10">0%</span></div>
+<hr>
+<div class="result">Total Members: <span id="tracks">0</span></div>
+<div class="result">Rows: <span id="rows">0</span></div>
+<div class="result">Closest Distance: <span id="closest">-</span></div>
+<div class="result">Closest Time: <span id="ctime">-</span></div>
+<div class="result">Max Wind: <span id="wind">-</span></div>
+<div class="result">Lowest Pressure: <span id="pressure">-</span></div>
+</div>
+
+<div class="card">
+<h2>WhatsApp Summary</h2>
+<textarea id="summary" readonly></textarea>
+<button onclick="copySummary()">Copy WhatsApp Summary</button>
+</div>
+
+<script>
+const HK_LAT = 22.3193;
+const HK_LON = 114.1694;
+
+function distKm(lat1, lon1, lat2, lon2){
+  const R = 6371;
+  const dLat = (lat2-lat1) * Math.PI / 180;
+  const dLon = (lon2-lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat/2)**2 +
+    Math.cos(lat1*Math.PI/180) *
+    Math.cos(lat2*Math.PI/180) *
+    Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function pct(n,total){
+  if(!total) return "0%";
+  return ((n/total)*100).toFixed(1) + "%";
+}
+
+function maxNum(arr){
+  let m = 0;
+  for(const v of arr){
+    const n = parseFloat(v);
+    if(!isNaN(n) && n > m) m = n;
+  }
+  return m;
+}
+
+function readCSV(){
+  const file = document.getElementById("csvFile").files[0];
+  if(!file){ alert("Select CSV first"); return; }
+
+  document.getElementById("status").innerText = "Reading...";
+
+  const reader = new FileReader();
+
+  reader.onload = function(e){
+    const text = e.target.result;
+    const lines = text.split(/\r?\n/);
+
+    let dataStarted = false;
+    let headers = [];
+    let rows = 0;
+    const trackMap = new Map();
+
+    let globalClosest = Infinity;
+    let globalClosestTime = "-";
+    let maxWind = -Infinity;
+    let minPressure = Infinity;
+
+    for(const line of lines){
+      if(!line.trim()) continue;
+
+      if(line.includes("# BEGIN DATA")){
+        dataStarted = true;
+        continue;
+      }
+
+      if(!dataStarted || line.startsWith("#")) continue;
+
+      const cols = line.split(",");
+
+      if(headers.length === 0){
+        headers = cols;
+        continue;
+      }
+
+      if(cols.length < 21) continue;
+
+      const sample = cols[2];
+      const validTime = cols[3];
+      const lat = parseFloat(cols[5]);
+      const lon = parseFloat(cols[6]);
+      const pressure = parseFloat(cols[7]);
+      const wind = parseFloat(cols[8]);
+
+      const r34 = maxNum([cols[10],cols[11],cols[12],cols[13]]);
+      const r50 = maxNum([cols[14],cols[15],cols[16],cols[17]]);
+      const r64 = maxNum([cols[18],cols[19],cols[20],cols[21]]);
+
+      if(isNaN(lat) || isNaN(lon)) continue;
+      rows++;
+
+      const d = distKm(HK_LAT, HK_LON, lat, lon);
+
+      if(!trackMap.has(sample)){
+        trackMap.set(sample,{
+          closest:Infinity,
+          time:"-",
+          t1:false,
+          t3:false,
+          t8:false,
+          t9:false,
+          t10:false,
+          maxWind:-Infinity,
+          minPressure:Infinity
+        });
+      }
+
+      const t = trackMap.get(sample);
+
+      if(d < t.closest){
+        t.closest = d;
+        t.time = validTime;
+      }
+
+      if(d <= 800) t.t1 = true;
+      if(d <= 500 && wind >= 34) t.t3 = true;
+      if(r34 > 0 && d <= r34) t.t8 = true;
+      if(r50 > 0 && d <= r50 && wind >= 64) t.t9 = true;
+      if(r64 > 0 && d <= r64) t.t10 = true;
+
+      if(!isNaN(wind) && wind > t.maxWind) t.maxWind = wind;
+      if(!isNaN(pressure) && pressure < t.minPressure) t.minPressure = pressure;
+
+      if(d < globalClosest){
+        globalClosest = d;
+        globalClosestTime = validTime;
+      }
+
+      if(!isNaN(wind) && wind > maxWind) maxWind = wind;
+      if(!isNaN(pressure) && pressure < minPressure) minPressure = pressure;
+    }
+
+    const total = trackMap.size;
+    let c1=0,c3=0,c8=0,c9=0,c10=0;
+
+    for(const t of trackMap.values()){
+      if(t.t1) c1++;
+      if(t.t3) c3++;
+      if(t.t8) c8++;
+      if(t.t9) c9++;
+      if(t.t10) c10++;
+    }
+
+    const p1 = total ? c1/total : 0;
+    const p3 = total ? c3/total : 0;
+    const p8 = total ? c8/total : 0;
+    const p9 = total ? c9/total : 0;
+    const p10 = total ? c10/total : 0;
+
+    let overall = "LOW";
+    let cls = "low";
+
+    if(p10 >= 0.05){ overall = "T10 RISK"; cls = "extreme"; }
+    else if(p9 >= 0.10){ overall = "T9 RISK"; cls = "danger"; }
+    else if(p8 >= 0.15){ overall = "T8 POSSIBLE"; cls = "high"; }
+    else if(p3 >= 0.25){ overall = "T3 POSSIBLE"; cls = "mid"; }
+    else if(p1 >= 0.30){ overall = "T1 POSSIBLE"; cls = "mid"; }
+
+    document.getElementById("status").innerText = "Analysis Complete";
+    document.getElementById("tracks").innerText = total;
+    document.getElementById("rows").innerText = rows;
+    document.getElementById("t1").innerText = pct(c1,total);
+    document.getElementById("t3").innerText = pct(c3,total);
+    document.getElementById("t8").innerText = pct(c8,total);
+    document.getElementById("t9").innerText = pct(c9,total);
+    document.getElementById("t10").innerText = pct(c10,total);
+    document.getElementById("closest").innerText = isFinite(globalClosest) ? globalClosest.toFixed(0) + " km" : "-";
+    document.getElementById("ctime").innerText = globalClosestTime;
+    document.getElementById("wind").innerText = isFinite(maxWind) ? maxWind.toFixed(1) + " kt" : "-";
+    document.getElementById("pressure").innerText = isFinite(minPressure) ? minPressure.toFixed(1) + " hPa" : "-";
+
+    const o = document.getElementById("overall");
+    o.innerText = overall;
+    o.className = cls;
+
+    const summary =
+`HK Typhoon AI Forecast
+Source: Google WeatherNext FNV3 Ensemble
+Members: ${total}
+Rows: ${rows}
+
+Overall Risk: ${overall}
+
+T1 Risk: ${pct(c1,total)}
+T3 Risk: ${pct(c3,total)}
+T8 Risk: ${pct(c8,total)}
+T9 Risk: ${pct(c9,total)}
+T10 Risk: ${pct(c10,total)}
+
+Closest Distance: ${isFinite(globalClosest) ? globalClosest.toFixed(0)+" km" : "-"}
+Closest Time: ${globalClosestTime}
+Max Wind: ${isFinite(maxWind) ? maxWind.toFixed(1)+" kt" : "-"}
+Lowest Pressure: ${isFinite(minPressure) ? minPressure.toFixed(1)+" hPa" : "-"}
+
+Note: AI estimate only. Not official HKO warning.`;
+
+    document.getElementById("summary").value = summary;
+  };
+
+  reader.readAsText(file);
+}
+
+function copySummary(){
+  const txt = document.getElementById("summary");
+  txt.select();
+  document.execCommand("copy");
+  alert("Copied");
+}
+</script>
+
+</body>
+</html>
