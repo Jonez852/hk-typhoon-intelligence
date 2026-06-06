@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HK Typhoon Intelligence V2</title>
+<style>
+body{font-family:Arial;background:#0f172a;color:white;padding:20px}
+h1{text-align:center;font-size:34px}
+.card{background:#1e293b;padding:18px;border-radius:14px;margin-bottom:18px}
+button{width:100%;padding:14px;margin-top:12px;background:#2563eb;color:white;border:0;border-radius:10px;font-size:18px;font-weight:bold}
+input{width:100%;padding:10px}
+.result{font-size:22px;font-weight:bold;margin:12px 0}
+.small{font-size:15px;color:#cbd5e1}
+.low{color:#22c55e}.mid{color:#facc15}.high{color:#fb923c}.danger{color:#ef4444}
+</style>
+</head>
+<body>
+
+<h1>🌪 HK Typhoon Intelligence V2</h1>
+
+<div class="card">
+<h2>Upload FNV3 Ensemble CSV</h2>
+<input type="file" id="csvFile" accept=".csv">
+<button onclick="readCSV()">Analyze Hong Kong Risk</button>
+<p class="small">分析 Google AI / WeatherNext FNV3 Ensemble CSV</p>
+</div>
+
+<div class="card">
+<h2>HK Risk Result</h2>
+<div class="result">Status: <span id="status">Waiting</span></div>
+<div class="result">Threat Level: <span id="threat">-</span></div>
+<div class="result">Total Tracks: <span id="tracks">0</span></div>
+<div class="result">Rows: <span id="rows">0</span></div>
+<div class="result">Within 300km: <span id="p300">0%</span></div>
+<div class="result">Within 500km: <span id="p500">0%</span></div>
+<div class="result">Within 800km: <span id="p800">0%</span></div>
+<div class="result">Closest Distance: <span id="closest">-</span></div>
+<div class="result">Closest Time: <span id="ctime">-</span></div>
+<div class="result">Max Wind: <span id="wind">-</span></div>
+<div class="result">Lowest Pressure: <span id="pressure">-</span></div>
+</div>
+
+<script>
+const HK_LAT = 22.3193;
+const HK_LON = 114.1694;
+
+function distKm(lat1, lon1, lat2, lon2){
+  const R = 6371;
+  const dLat = (lat2-lat1) * Math.PI / 180;
+  const dLon = (lon2-lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat/2)**2 +
+    Math.cos(lat1*Math.PI/180) *
+    Math.cos(lat2*Math.PI/180) *
+    Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function pct(n,total){
+  if(!total) return "0%";
+  return ((n/total)*100).toFixed(1) + "%";
+}
+
+function readCSV(){
+  const file = document.getElementById("csvFile").files[0];
+  if(!file){ alert("Select CSV first"); return; }
+
+  document.getElementById("status").innerText = "Reading...";
+
+  const reader = new FileReader();
+
+  reader.onload = function(e){
+    const text = e.target.result;
+    const lines = text.split(/\r?\n/);
+
+    let dataStarted = false;
+    let headers = [];
+    let rows = 0;
+
+    const trackMap = new Map();
+
+    let globalClosest = Infinity;
+    let globalClosestTime = "-";
+    let maxWind = -Infinity;
+    let minPressure = Infinity;
+
+    for(const line of lines){
+      if(!line.trim()) continue;
+
+      if(line.includes("# BEGIN DATA")){
+        dataStarted = true;
+        continue;
+      }
+
+      if(!dataStarted || line.startsWith("#")) continue;
+
+      const cols = line.split(",");
+
+      if(headers.length === 0){
+        headers = cols;
+        continue;
+      }
+
+      if(cols.length < 9) continue;
+
+      const sample = cols[2];
+      const validTime = cols[3];
+      const lat = parseFloat(cols[5]);
+      const lon = parseFloat(cols[6]);
+      const pressure = parseFloat(cols[7]);
+      const wind = parseFloat(cols[8]);
+
+      if(isNaN(lat) || isNaN(lon)) continue;
+
+      rows++;
+
+      const d = distKm(HK_LAT, HK_LON, lat, lon);
+
+      if(!trackMap.has(sample)){
+        trackMap.set(sample, {closest: Infinity, time: "-", maxWind: -Infinity, minPressure: Infinity});
+      }
+
+      const t = trackMap.get(sample);
+
+      if(d < t.closest){
+        t.closest = d;
+        t.time = validTime;
+      }
+
+      if(!isNaN(wind) && wind > t.maxWind) t.maxWind = wind;
+      if(!isNaN(pressure) && pressure < t.minPressure) t.minPressure = pressure;
+
+      if(d < globalClosest){
+        globalClosest = d;
+        globalClosestTime = validTime;
+      }
+
+      if(!isNaN(wind) && wind > maxWind) maxWind = wind;
+      if(!isNaN(pressure) && pressure < minPressure) minPressure = pressure;
+    }
+
+    const totalTracks = trackMap.size;
+
+    let within300 = 0;
+    let within500 = 0;
+    let within800 = 0;
+
+    for(const t of trackMap.values()){
+      if(t.closest <= 300) within300++;
+      if(t.closest <= 500) within500++;
+      if(t.closest <= 800) within800++;
+    }
+
+    const p300 = totalTracks ? within300 / totalTracks : 0;
+    const p500 = totalTracks ? within500 / totalTracks : 0;
+
+    let threatText = "LOW";
+    let cls = "low";
+
+    if(p300 >= 0.35 || p500 >= 0.65){
+      threatText = "DANGER";
+      cls = "danger";
+    }else if(p300 >= 0.15 || p500 >= 0.40){
+      threatText = "HIGH";
+      cls = "high";
+    }else if(p300 >= 0.05 || p500 >= 0.20){
+      threatText = "MEDIUM";
+      cls = "mid";
+    }
+
+    document.getElementById("status").innerText = "Analysis Complete";
+    document.getElementById("tracks").innerText = totalTracks;
+    document.getElementById("rows").innerText = rows;
+    document.getElementById("p300").innerText = pct(within300,totalTracks);
+    document.getElementById("p500").innerText = pct(within500,totalTracks);
+    document.getElementById("p800").innerText = pct(within800,totalTracks);
+    document.getElementById("closest").innerText = isFinite(globalClosest) ? globalClosest.toFixed(0) + " km" : "-";
+    document.getElementById("ctime").innerText = globalClosestTime;
+    document.getElementById("wind").innerText = isFinite(maxWind) ? maxWind.toFixed(1) + " kt" : "-";
+    document.getElementById("pressure").innerText = isFinite(minPressure) ? minPressure.toFixed(1) + " hPa" : "-";
+
+    const threat = document.getElementById("threat");
+    threat.innerText = threatText;
+    threat.className = cls;
+  };
+
+  reader.readAsText(file);
+}
+</script>
+
+</body>
+</html>
