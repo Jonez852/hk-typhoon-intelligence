@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HK Typhoon Intelligence V5</title>
+<title>HK Typhoon Intelligence V6</title>
 <style>
 body{font-family:Arial;background:#0f172a;color:white;padding:20px}
 h1{text-align:center;font-size:30px}
@@ -13,19 +13,19 @@ input{width:100%;padding:10px}
 .result{font-size:21px;font-weight:bold;margin:11px 0}
 .small{font-size:14px;color:#cbd5e1;line-height:1.4}
 .low{color:#22c55e}.mid{color:#facc15}.high{color:#fb923c}.danger{color:#ef4444}.extreme{color:#c084fc}
-textarea{width:100%;height:260px;background:#020617;color:white;border:1px solid #334155;border-radius:10px;padding:10px;font-size:15px}
+textarea{width:100%;height:290px;background:#020617;color:white;border:1px solid #334155;border-radius:10px;padding:10px;font-size:15px}
 hr{border:0;border-top:1px solid #64748b}
 </style>
 </head>
 <body>
 
-<h1>🌪 HK Typhoon Intelligence V5</h1>
+<h1>🌪 HK Typhoon Intelligence V6</h1>
 
 <div class="card">
 <h2>Upload FNV3 Ensemble CSV</h2>
 <input type="file" id="csvFile" accept=".csv">
-<button onclick="readCSV()">Analyze HK Typhoon Risk</button>
-<p class="small">AI estimate only. Not official HKO warning.</p>
+<button onclick="readCSV()">Analyze HK Signal Risk</button>
+<p class="small">V6 uses distance + wind speed + 34/50/64kt wind radii. AI estimate only, not official HKO warning.</p>
 </div>
 
 <div class="card">
@@ -38,6 +38,12 @@ hr{border:0;border-top:1px solid #64748b}
 <div class="result">T8 Risk: <span id="t8">0%</span></div>
 <div class="result">T9 Risk: <span id="t9">0%</span></div>
 <div class="result">T10 Risk: <span id="t10">0%</span></div>
+<hr>
+<div class="result">Earliest T1: <span id="et1">-</span></div>
+<div class="result">Earliest T3: <span id="et3">-</span></div>
+<div class="result">Earliest T8: <span id="et8">-</span></div>
+<div class="result">Earliest T9: <span id="et9">-</span></div>
+<div class="result">Earliest T10: <span id="et10">-</span></div>
 <hr>
 <div class="result">Impact Window: <span id="window">-</span></div>
 <div class="result">Closest Distance: <span id="closest">-</span></div>
@@ -151,6 +157,7 @@ function readCSV(){
 
       const sample = cols[2];
       const validTime = cols[3];
+
       const lat = parseFloat(cols[5]);
       const lon = parseFloat(cols[6]);
       const pressure = parseFloat(cols[7]);
@@ -170,6 +177,7 @@ function readCSV(){
           closest:Infinity,
           time:"-",
           t1:false,t3:false,t8:false,t9:false,t10:false,
+          et1:"-",et3:"-",et8:"-",et9:"-",et10:"-",
           impactStart:"-",
           impactEnd:"-"
         });
@@ -182,17 +190,26 @@ function readCSV(){
         t.time = validTime;
       }
 
-      const hitT1 = d <= 800;
-      const hitT3 = d <= 500 || (r34 > 0 && d <= r34);
+      /*
+      V6 HKO-style estimate:
+      T1  = centre <= 800km AND wind >= 34kt
+      T3  = centre <= 500km AND wind >= 41kt
+      T8  = HK inside 34kt wind radius
+      T9  = HK inside 50kt wind radius
+      T10 = HK inside 64kt wind radius
+      */
+
+      const hitT1 = d <= 800 && wind >= 34;
+      const hitT3 = d <= 500 && wind >= 41;
       const hitT8 = r34 > 0 && d <= r34;
       const hitT9 = r50 > 0 && d <= r50;
       const hitT10 = r64 > 0 && d <= r64;
 
-      if(hitT1) t.t1 = true;
-      if(hitT3) t.t3 = true;
-      if(hitT8) t.t8 = true;
-      if(hitT9) t.t9 = true;
-      if(hitT10) t.t10 = true;
+      if(hitT1){ t.t1 = true; t.et1 = earlier(t.et1, validTime); }
+      if(hitT3){ t.t3 = true; t.et3 = earlier(t.et3, validTime); }
+      if(hitT8){ t.t8 = true; t.et8 = earlier(t.et8, validTime); }
+      if(hitT9){ t.t9 = true; t.et9 = earlier(t.et9, validTime); }
+      if(hitT10){ t.t10 = true; t.et10 = earlier(t.et10, validTime); }
 
       if(hitT1 || hitT3 || hitT8 || hitT9 || hitT10){
         t.impactStart = earlier(t.impactStart, validTime);
@@ -211,14 +228,15 @@ function readCSV(){
     const total = trackMap.size;
     let c1=0,c3=0,c8=0,c9=0,c10=0;
     let d200=0,d400=0,d800=0,d999=0;
+    let et1="-",et3="-",et8="-",et9="-",et10="-";
     let winStart="-", winEnd="-";
 
     for(const t of trackMap.values()){
-      if(t.t1) c1++;
-      if(t.t3) c3++;
-      if(t.t8) c8++;
-      if(t.t9) c9++;
-      if(t.t10) c10++;
+      if(t.t1){ c1++; et1 = earlier(et1,t.et1); }
+      if(t.t3){ c3++; et3 = earlier(et3,t.et3); }
+      if(t.t8){ c8++; et8 = earlier(et8,t.et8); }
+      if(t.t9){ c9++; et9 = earlier(et9,t.et9); }
+      if(t.t10){ c10++; et10 = earlier(et10,t.et10); }
 
       if(t.closest <= 200) d200++;
       else if(t.closest <= 400) d400++;
@@ -256,6 +274,12 @@ function readCSV(){
     document.getElementById("t9").innerText = pct(c9,total);
     document.getElementById("t10").innerText = pct(c10,total);
 
+    document.getElementById("et1").innerText = et1;
+    document.getElementById("et3").innerText = et3;
+    document.getElementById("et8").innerText = et8;
+    document.getElementById("et9").innerText = et9;
+    document.getElementById("et10").innerText = et10;
+
     document.getElementById("window").innerText = impactWindow;
     document.getElementById("closest").innerText = isFinite(globalClosest) ? globalClosest.toFixed(0) + " km" : "-";
     document.getElementById("ctime").innerText = globalClosestTime;
@@ -271,7 +295,7 @@ function readCSV(){
     document.getElementById("rows").innerText = rows;
 
     const summary =
-`🌪 HK Typhoon AI Forecast V5
+`🌪 HK Typhoon AI Forecast V6
 
 Source: Google WeatherNext FNV3 Ensemble
 Members: ${total}
@@ -284,6 +308,12 @@ T3 Risk: ${pct(c3,total)}
 T8 Risk: ${pct(c8,total)}
 T9 Risk: ${pct(c9,total)}
 T10 Risk: ${pct(c10,total)}
+
+Earliest T1: ${et1}
+Earliest T3: ${et3}
+Earliest T8: ${et8}
+Earliest T9: ${et9}
+Earliest T10: ${et10}
 
 Impact Window:
 ${impactWindow}
