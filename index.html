@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HK Typhoon Intelligence V6</title>
+<title>HK Typhoon Intelligence V7</title>
 <style>
 body{font-family:Arial;background:#0f172a;color:white;padding:20px}
 h1{text-align:center;font-size:30px}
@@ -13,19 +13,20 @@ input{width:100%;padding:10px}
 .result{font-size:21px;font-weight:bold;margin:11px 0}
 .small{font-size:14px;color:#cbd5e1;line-height:1.4}
 .low{color:#22c55e}.mid{color:#facc15}.high{color:#fb923c}.danger{color:#ef4444}.extreme{color:#c084fc}
-textarea{width:100%;height:290px;background:#020617;color:white;border:1px solid #334155;border-radius:10px;padding:10px;font-size:15px}
+textarea{width:100%;height:320px;background:#020617;color:white;border:1px solid #334155;border-radius:10px;padding:10px;font-size:15px}
+pre{white-space:pre-wrap;background:#020617;border-radius:10px;padding:12px;color:#e2e8f0;font-size:14px}
 hr{border:0;border-top:1px solid #64748b}
 </style>
 </head>
 <body>
 
-<h1>🌪 HK Typhoon Intelligence V6</h1>
+<h1>🌪 HK Typhoon Intelligence V7</h1>
 
 <div class="card">
 <h2>Upload FNV3 Ensemble CSV</h2>
 <input type="file" id="csvFile" accept=".csv">
-<button onclick="readCSV()">Analyze HK Signal Risk</button>
-<p class="small">V6 uses distance + wind speed + 34/50/64kt wind radii. AI estimate only, not official HKO warning.</p>
+<button onclick="readCSV()">Analyze HK Typhoon Risk</button>
+<p class="small">AI estimate only. Not official HKO warning.</p>
 </div>
 
 <div class="card">
@@ -39,12 +40,6 @@ hr{border:0;border-top:1px solid #64748b}
 <div class="result">T9 Risk: <span id="t9">0%</span></div>
 <div class="result">T10 Risk: <span id="t10">0%</span></div>
 <hr>
-<div class="result">Earliest T1: <span id="et1">-</span></div>
-<div class="result">Earliest T3: <span id="et3">-</span></div>
-<div class="result">Earliest T8: <span id="et8">-</span></div>
-<div class="result">Earliest T9: <span id="et9">-</span></div>
-<div class="result">Earliest T10: <span id="et10">-</span></div>
-<hr>
 <div class="result">Impact Window: <span id="window">-</span></div>
 <div class="result">Closest Distance: <span id="closest">-</span></div>
 <div class="result">Closest Time: <span id="ctime">-</span></div>
@@ -53,11 +48,28 @@ hr{border:0;border-top:1px solid #64748b}
 </div>
 
 <div class="card">
+<h2>Distance Percentiles</h2>
+<div class="result">P50 Distance: <span id="p50">-</span></div>
+<div class="result">P10 Distance: <span id="p10">-</span></div>
+<div class="result">P01 Distance: <span id="p01">-</span></div>
+</div>
+
+<div class="card">
 <h2>Distance Distribution</h2>
 <div class="result">0-200km: <span id="d200">0</span></div>
 <div class="result">200-400km: <span id="d400">0</span></div>
 <div class="result">400-800km: <span id="d800">0</span></div>
 <div class="result">800km+: <span id="d999">0</span></div>
+</div>
+
+<div class="card">
+<h2>Risk Explanation</h2>
+<pre id="explain">Waiting for CSV...</pre>
+</div>
+
+<div class="card">
+<h2>Top 10 Worst Tracks</h2>
+<pre id="worst">Waiting for CSV...</pre>
 </div>
 
 <div class="card">
@@ -80,11 +92,7 @@ function distKm(lat1, lon1, lat2, lon2){
   const R = 6371;
   const dLat = (lat2-lat1) * Math.PI / 180;
   const dLon = (lon2-lon1) * Math.PI / 180;
-  const a =
-    Math.sin(dLat/2)**2 +
-    Math.cos(lat1*Math.PI/180) *
-    Math.cos(lat2*Math.PI/180) *
-    Math.sin(dLon/2)**2;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
@@ -114,6 +122,12 @@ function later(a,b){
   return new Date(a) > new Date(b) ? a : b;
 }
 
+function percentile(sortedArr, p){
+  if(sortedArr.length === 0) return "-";
+  const idx = Math.floor((p/100) * (sortedArr.length - 1));
+  return sortedArr[idx];
+}
+
 function readCSV(){
   const file = document.getElementById("csvFile").files[0];
   if(!file){ alert("Select CSV first"); return; }
@@ -138,26 +152,15 @@ function readCSV(){
 
     for(const line of lines){
       if(!line.trim()) continue;
-
-      if(line.includes("# BEGIN DATA")){
-        dataStarted = true;
-        continue;
-      }
-
+      if(line.includes("# BEGIN DATA")){ dataStarted = true; continue; }
       if(!dataStarted || line.startsWith("#")) continue;
 
       const cols = line.split(",");
-
-      if(headers.length === 0){
-        headers = cols;
-        continue;
-      }
-
+      if(headers.length === 0){ headers = cols; continue; }
       if(cols.length < 22) continue;
 
       const sample = cols[2];
       const validTime = cols[3];
-
       const lat = parseFloat(cols[5]);
       const lon = parseFloat(cols[6]);
       const pressure = parseFloat(cols[7]);
@@ -174,8 +177,14 @@ function readCSV(){
 
       if(!trackMap.has(sample)){
         trackMap.set(sample,{
+          sample,
           closest:Infinity,
           time:"-",
+          maxWind:-Infinity,
+          minPressure:Infinity,
+          maxR34:0,
+          maxR50:0,
+          maxR64:0,
           t1:false,t3:false,t8:false,t9:false,t10:false,
           et1:"-",et3:"-",et8:"-",et9:"-",et10:"-",
           impactStart:"-",
@@ -185,19 +194,12 @@ function readCSV(){
 
       const t = trackMap.get(sample);
 
-      if(d < t.closest){
-        t.closest = d;
-        t.time = validTime;
-      }
-
-      /*
-      V6 HKO-style estimate:
-      T1  = centre <= 800km AND wind >= 34kt
-      T3  = centre <= 500km AND wind >= 41kt
-      T8  = HK inside 34kt wind radius
-      T9  = HK inside 50kt wind radius
-      T10 = HK inside 64kt wind radius
-      */
+      if(d < t.closest){ t.closest = d; t.time = validTime; }
+      if(!isNaN(wind) && wind > t.maxWind) t.maxWind = wind;
+      if(!isNaN(pressure) && pressure < t.minPressure) t.minPressure = pressure;
+      if(r34 > t.maxR34) t.maxR34 = r34;
+      if(r50 > t.maxR50) t.maxR50 = r50;
+      if(r64 > t.maxR64) t.maxR64 = r64;
 
       const hitT1 = d <= 800 && wind >= 34;
       const hitT3 = d <= 500 && wind >= 41;
@@ -216,27 +218,24 @@ function readCSV(){
         t.impactEnd = later(t.impactEnd, validTime);
       }
 
-      if(d < globalClosest){
-        globalClosest = d;
-        globalClosestTime = validTime;
-      }
-
+      if(d < globalClosest){ globalClosest = d; globalClosestTime = validTime; }
       if(!isNaN(wind) && wind > maxWind) maxWind = wind;
       if(!isNaN(pressure) && pressure < minPressure) minPressure = pressure;
     }
 
-    const total = trackMap.size;
+    const tracks = Array.from(trackMap.values());
+    const total = tracks.length;
+
     let c1=0,c3=0,c8=0,c9=0,c10=0;
     let d200=0,d400=0,d800=0,d999=0;
-    let et1="-",et3="-",et8="-",et9="-",et10="-";
     let winStart="-", winEnd="-";
 
-    for(const t of trackMap.values()){
-      if(t.t1){ c1++; et1 = earlier(et1,t.et1); }
-      if(t.t3){ c3++; et3 = earlier(et3,t.et3); }
-      if(t.t8){ c8++; et8 = earlier(et8,t.et8); }
-      if(t.t9){ c9++; et9 = earlier(et9,t.et9); }
-      if(t.t10){ c10++; et10 = earlier(et10,t.et10); }
+    for(const t of tracks){
+      if(t.t1) c1++;
+      if(t.t3) c3++;
+      if(t.t8) c8++;
+      if(t.t9) c9++;
+      if(t.t10) c10++;
 
       if(t.closest <= 200) d200++;
       else if(t.closest <= 400) d400++;
@@ -247,22 +246,58 @@ function readCSV(){
       if(t.impactEnd !== "-") winEnd = later(winEnd, t.impactEnd);
     }
 
+    const distances = tracks.map(t => t.closest).filter(x => isFinite(x)).sort((a,b)=>a-b);
+    const p50 = percentile(distances,50);
+    const p10 = percentile(distances,10);
+    const p01 = percentile(distances,1);
+
     const p1 = total ? c1/total : 0;
     const p3 = total ? c3/total : 0;
     const p8 = total ? c8/total : 0;
     const p9 = total ? c9/total : 0;
-    const p10 = total ? c10/total : 0;
+    const p10risk = total ? c10/total : 0;
 
     let overall = "LOW";
     let cls = "low";
 
-    if(p10 >= 0.03){ overall = "T10 RISK"; cls = "extreme"; }
+    if(p10risk >= 0.03){ overall = "T10 RISK"; cls = "extreme"; }
     else if(p9 >= 0.05){ overall = "T9 RISK"; cls = "danger"; }
     else if(p8 >= 0.10){ overall = "T8 POSSIBLE"; cls = "high"; }
     else if(p3 >= 0.20){ overall = "T3 POSSIBLE"; cls = "mid"; }
     else if(p1 >= 0.25){ overall = "T1 POSSIBLE"; cls = "mid"; }
 
     const impactWindow = winStart === "-" ? "-" : `${winStart} → ${winEnd}`;
+
+    const worstTracks = tracks
+      .sort((a,b)=>a.closest-b.closest)
+      .slice(0,10);
+
+    const worstText = worstTracks.map((t,i)=>
+`#${i+1}
+Member: ${t.sample}
+Closest: ${t.closest.toFixed(0)} km
+Time: ${t.time}
+Max Wind: ${isFinite(t.maxWind)?t.maxWind.toFixed(1)+" kt":"-"}
+Lowest Pressure: ${isFinite(t.minPressure)?t.minPressure.toFixed(1)+" hPa":"-"}
+Max 34kt Radius: ${t.maxR34.toFixed(0)} km
+Max 50kt Radius: ${t.maxR50.toFixed(0)} km
+Max 64kt Radius: ${t.maxR64.toFixed(0)} km`
+    ).join("\n\n");
+
+    const explanation =
+`Risk explanation:
+• ${c1} / ${total} members meet T1 condition.
+• ${c3} / ${total} members meet T3 condition.
+• ${c8} / ${total} members show 34kt wind radius reaching Hong Kong.
+• ${c9} / ${total} members show 50kt wind radius reaching Hong Kong.
+• ${c10} / ${total} members show 64kt wind radius reaching Hong Kong.
+• Closest ensemble member reaches ${isFinite(globalClosest)?globalClosest.toFixed(0)+" km":"-"} from Hong Kong.
+• P50 distance: ${p50 === "-" ? "-" : p50.toFixed(0)+" km"}
+• P10 distance: ${p10 === "-" ? "-" : p10.toFixed(0)+" km"}
+• P01 distance: ${p01 === "-" ? "-" : p01.toFixed(0)+" km"}
+
+Interpretation:
+${overall === "LOW" ? "Most ensemble members stay far from Hong Kong in this run." : "Some ensemble members show possible Hong Kong impact. Monitor next update."}`;
 
     document.getElementById("status").innerText = "Analysis Complete";
     document.getElementById("overall").innerText = overall;
@@ -274,17 +309,15 @@ function readCSV(){
     document.getElementById("t9").innerText = pct(c9,total);
     document.getElementById("t10").innerText = pct(c10,total);
 
-    document.getElementById("et1").innerText = et1;
-    document.getElementById("et3").innerText = et3;
-    document.getElementById("et8").innerText = et8;
-    document.getElementById("et9").innerText = et9;
-    document.getElementById("et10").innerText = et10;
-
     document.getElementById("window").innerText = impactWindow;
     document.getElementById("closest").innerText = isFinite(globalClosest) ? globalClosest.toFixed(0) + " km" : "-";
     document.getElementById("ctime").innerText = globalClosestTime;
     document.getElementById("wind").innerText = isFinite(maxWind) ? maxWind.toFixed(1) + " kt" : "-";
     document.getElementById("pressure").innerText = isFinite(minPressure) ? minPressure.toFixed(1) + " hPa" : "-";
+
+    document.getElementById("p50").innerText = p50 === "-" ? "-" : p50.toFixed(0) + " km";
+    document.getElementById("p10").innerText = p10 === "-" ? "-" : p10.toFixed(0) + " km";
+    document.getElementById("p01").innerText = p01 === "-" ? "-" : p01.toFixed(0) + " km";
 
     document.getElementById("d200").innerText = `${d200} (${pct(d200,total)})`;
     document.getElementById("d400").innerText = `${d400} (${pct(d400,total)})`;
@@ -294,8 +327,11 @@ function readCSV(){
     document.getElementById("tracks").innerText = total;
     document.getElementById("rows").innerText = rows;
 
+    document.getElementById("explain").innerText = explanation;
+    document.getElementById("worst").innerText = worstText;
+
     const summary =
-`🌪 HK Typhoon AI Forecast V6
+`🌪 HK Typhoon AI Forecast V7
 
 Source: Google WeatherNext FNV3 Ensemble
 Members: ${total}
@@ -309,12 +345,6 @@ T8 Risk: ${pct(c8,total)}
 T9 Risk: ${pct(c9,total)}
 T10 Risk: ${pct(c10,total)}
 
-Earliest T1: ${et1}
-Earliest T3: ${et3}
-Earliest T8: ${et8}
-Earliest T9: ${et9}
-Earliest T10: ${et10}
-
 Impact Window:
 ${impactWindow}
 
@@ -323,6 +353,11 @@ ${isFinite(globalClosest) ? globalClosest.toFixed(0)+" km" : "-"}
 
 Closest Time:
 ${globalClosestTime}
+
+Distance Percentiles:
+P50: ${p50 === "-" ? "-" : p50.toFixed(0)+" km"}
+P10: ${p10 === "-" ? "-" : p10.toFixed(0)+" km"}
+P01: ${p01 === "-" ? "-" : p01.toFixed(0)+" km"}
 
 Max Wind:
 ${isFinite(maxWind) ? maxWind.toFixed(1)+" kt" : "-"}
