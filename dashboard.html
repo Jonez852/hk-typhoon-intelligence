@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HK Typhoon Dashboard V1</title>
+
+<style>
+body{
+font-family:Arial;
+background:#0f172a;
+color:white;
+padding:20px;
+}
+
+.card{
+background:#1e293b;
+padding:15px;
+border-radius:12px;
+margin-bottom:15px;
+}
+
+h1{
+text-align:center;
+}
+
+input{
+width:100%;
+padding:10px;
+}
+
+button{
+width:100%;
+padding:12px;
+margin-top:10px;
+background:#2563eb;
+color:white;
+border:none;
+border-radius:8px;
+font-size:16px;
+}
+
+.result{
+font-size:20px;
+font-weight:bold;
+margin-top:10px;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>🌪 HK Typhoon Intelligence</h1>
+
+<div class="card">
+<h2>Upload Ensemble CSV</h2>
+<input type="file" id="csvFile">
+<button onclick="readCSV()">Analyze</button>
+</div>
+
+<div class="card">
+<h2>Results</h2>
+
+<div class="result">
+Total Tracks:
+<span id="tracks">0</span>
+</div>
+
+<div class="result">
+Rows:
+<span id="rows">0</span>
+</div>
+
+<div class="result">
+Status:
+<span id="status">Waiting</span>
+</div>
+
+</div>
+
+<script>
+
+function readCSV(){
+
+const file=document.getElementById("csvFile").files[0];
+
+if(!file){
+alert("Select CSV first");
+return;
+}
+
+const reader=new FileReader();
+
+reader.onload=function(e){
+
+const text=e.target.result;
+
+const lines=text.split("\n");
+
+document.getElementById("rows").innerText=
+lines.length;
+
+let samples=new Set();
+
+for(let i=0;i<lines.length;i++){
+
+const cols=lines[i].split(",");
+
+if(cols.length>2){
+
+samples.add(cols[2]);
+
+}
+
+}
+
+document.getElementById("tracks").innerText=
+samples.size;
+
+document.getElementById("status").innerText=
+"CSV Loaded";
+
+};
+
+reader.readAsText(file);
+
+}
+
+</script>
+
+</body>
+</html>
