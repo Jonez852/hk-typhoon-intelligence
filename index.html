@@ -439,9 +439,10 @@ async function loadLatestGoogleCSV(){
       }
     );
 
-    if(!res.ok){
-      throw new Error("Download failed");
-    }
+   if(!res.ok){
+  const errorText = await res.text();
+  throw new Error(errorText);
+}
 
     const text = await res.text();
 
