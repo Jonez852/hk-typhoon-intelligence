@@ -414,19 +414,30 @@ Note: AI estimate only. Not official HKO warning.`;
 }
 async function loadLatestGoogleCSV(){
 
-  const url = prompt(
+  const googleUrl = prompt(
     "貼 Google Weather Lab CSV 連結",
-    "https://deepmind.google.com/science/weatherlab/download/cyclones/FNV3/ensemble_mean/paired/csv/FNV3_2026_06_08T00_00_paired.csv"
+    "https://"
   );
 
-  if(!url) return;
+  if(!googleUrl) return;
 
   try{
 
     document.getElementById("status").innerText =
       "Downloading Google CSV...";
 
-    const res = await fetch(url);
+    const res = await fetch(
+      "https://hk-typhoon-telegram.jones1985624.workers.dev",
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          csv_url: googleUrl
+        })
+      }
+    );
 
     if(!res.ok){
       throw new Error("Download failed");
@@ -435,7 +446,7 @@ async function loadLatestGoogleCSV(){
     const text = await res.text();
 
     const blob = new Blob([text], {type:"text/csv"});
-    const file = new File([blob],"google.csv");
+    const file = new File([blob], "google.csv");
 
     const dt = new DataTransfer();
     dt.items.add(file);
@@ -456,7 +467,7 @@ async function loadLatestGoogleCSV(){
       "Google CSV Failed";
 
   }
-
+}
 }function copySummary(){
   const txt = document.getElementById("summary");
   txt.select();
