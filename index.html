@@ -413,100 +413,77 @@ Note: AI estimate only. Not official HKO warning.`;
   reader.readAsText(file);
 }
 async function loadLatestGoogleCSV(){
+  document.getElementById("status").innerText = "Auto downloading Google CSV...";
 
-  const googleUrl = prompt(
-    "貼 Google Weather Lab CSV 連結",
-    "https://"
-  );
+  const TELEGRAM_WORKER_URL = "https://hk-typhoon-telegram.jones1985624.workers.dev";
 
-  if(!googleUrl) return;
+  function pad(n){ return String(n).padStart(2,"0"); }
 
-  try{
+  function makeUrl(date, hour){
+    const yyyy = date.getUTCFullYear();
+    const mm = pad(date.getUTCMonth() + 1);
+    const dd = pad(date.getUTCDate());
+    const hh = pad(hour);
 
-    document.getElementById("status").innerText =
-      "Downloading Google CSV...";
-
-    const res = await fetch(
-      "https://hk-typhoon-telegram.jones1985624.workers.dev",
-      {
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-          csv_url: googleUrl
-        })
-      }
-    );
-
-   if(!res.ok){
-  const errorText = await res.text();
-  throw new Error(errorText);
-}
-
-    const text = await res.text();
-
-    const blob = new Blob([text], {type:"text/csv"});
-    const file = new File([blob], "google.csv");
-
-    const dt = new DataTransfer();
-    dt.items.add(file);
-
-    document.getElementById("csvFile").files =
-      dt.files;
-
-    document.getElementById("status").innerText =
-      "Google CSV Loaded";
-
-    readCSV();
-
-  }catch(err){
-
-    alert("Google CSV Error: " + err.message);
-
-    document.getElementById("status").innerText =
-      "Google CSV Failed";
-
-  }
-}
-function copySummary(){
-  const txt = document.getElementById("summary");
-  txt.select();
-  document.execCommand("copy");
-  alert("Copied");
-}
-
-async function sendTelegram(){
-  const message = document.getElementById("summary").value;
-  if(!message.trim()){
-    alert("No summary yet. Run analysis first.");
-    return;
+    return `https://deepmind.google.com/science/weatherlab/download/cyclones/FNV3_LARGE_ENSEMBLE/ensemble_mean/paired/csv/FNV3_LARGE_ENSEMBLE_${yyyy}_${mm}_${dd}T${hh}_00_paired.csv`;
   }
 
-  document.getElementById("telegramStatus").innerText = "Telegram: Sending...";
+  const hours = [18,12,6,0];
+  const candidates = [];
 
-  try{
-    const res = await fetch(TELEGRAM_WORKER_URL, {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({ text: message })
-    });
-
-    const data = await res.text();
-
-    if(res.ok){
-      document.getElementById("telegramStatus").innerText = "Telegram: Sent";
-      alert("Telegram sent");
-    }else{
-      document.getElementById("telegramStatus").innerText = "Telegram: Error";
-      alert(data);
+  for(let dayBack = 0; dayBack <= 4; dayBack++){
+    const d = new Date();
+    d.setUTCDate(d.getUTCDate() - dayBack);
+    for(const h of hours){
+      candidates.push(makeUrl(d,h));
     }
+  }
+
+  const tried = [];
+
+  try{
+    for(const url of candidates){
+      document.getElementById("status").innerText =
+        "Trying Google CSV: " + url.split("/").pop();
+
+      const res = await fetch(TELEGRAM_WORKER_URL, {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({ csv_url:url })
+      });
+
+      if(!res.ok){
+        const err = await res.text();
+        tried.push(url + " => " + err);
+        continue;
+      }
+
+      const text = await res.text();
+
+      if(!text.includes("# BEGIN DATA") && !text.includes(",")){
+        tried.push(url + " => invalid csv");
+        continue;
+      }
+
+      const blob = new Blob([text], {type:"text/csv"});
+      const file = new File([blob], "google_auto.csv");
+
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      document.getElementById("csvFile").files = dt.files;
+
+      document.getElementById("status").innerText =
+        "Google CSV Loaded: " + url.split("/").pop();
+
+      readCSV();
+      return;
+    }
+
+    alert("All Google CSV candidates failed:\n\n" + tried.join("\n\n"));
+    document.getElementById("status").innerText = "Auto CSV Failed";
+
   }catch(err){
-    document.getElementById("telegramStatus").innerText = "Telegram: Error";
-    alert("Telegram error: " + err.message);
+    alert("Auto CSV Error: " + err.message);
+    document.getElementById("status").innerText = "Auto CSV Error";
   }
 }
-</script>
-
-</body>
-</html>
