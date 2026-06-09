@@ -175,7 +175,9 @@ function readCSV(){
 
         if(headers.length === 0){
           headers = cols;
-          continue;
+
+          console.log(headers);
+alert(headers.join("\n"));          continue;
         }
 
         if(cols.length < 22) continue;
