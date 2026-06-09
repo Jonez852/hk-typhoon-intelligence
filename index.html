@@ -182,11 +182,15 @@ function readCSV(){
 
         const sample = cols[2];
         const validTime = cols[3];
-        const lat = parseFloat(cols[5]);
-        const lon = parseFloat(cols[6]);
-        const pressure = parseFloat(cols[7]);
-        const wind = parseFloat(cols[8]);
+        const latIdx = headers.findIndex(h => h.toLowerCase().includes("lat"));
+const lonIdx = headers.findIndex(h => h.toLowerCase().includes("lon"));
+const pressureIdx = headers.findIndex(h => h.toLowerCase().includes("pressure") || h.toLowerCase().includes("mslp"));
+const windIdx = headers.findIndex(h => h.toLowerCase().includes("wind"));
 
+const lat = parseFloat(cols[latIdx]);
+const lon = parseFloat(cols[lonIdx]);
+const pressure = parseFloat(cols[pressureIdx]);
+const wind = parseFloat(cols[windIdx]);
         const r34 = maxNum([cols[10],cols[11],cols[12],cols[13]]);
         const r50 = maxNum([cols[14],cols[15],cols[16],cols[17]]);
         const r64 = maxNum([cols[18],cols[19],cols[20],cols[21]]);
