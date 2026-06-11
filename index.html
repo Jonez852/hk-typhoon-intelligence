@@ -90,9 +90,7 @@ hr{border:0;border-top:1px solid #64748b}
 <script>
 const HK_LAT = 22.3193;
 const HK_LON = 114.1694;
-
-// Next step will update this Worker to accept Telegram messages.
-const TELEGRAM_WORKER_URL = "https://royal-river-a29b.jones1985624.workers.dev";
+const TELEGRAM_WORKER_URL = "https://hk-typhoon-telegram.jones1985624.workers.dev";
 
 function distKm(lat1, lon1, lat2, lon2){
   const R = 6371;
@@ -173,24 +171,26 @@ function readCSV(){
 
         const cols = line.split(",");
 
-      if(headers.length === 0){
-  headers = cols;
-  continue;
-}
+        if(headers.length === 0){
+          headers = cols;
+          continue;
+        }
 
         if(cols.length < 22) continue;
 
         const sample = cols[2];
         const validTime = cols[3];
-        const latIdx = headers.findIndex(h => h.toLowerCase().includes("lat"));
-const lonIdx = headers.findIndex(h => h.toLowerCase().includes("lon"));
-const pressureIdx = headers.findIndex(h => h.toLowerCase().includes("pressure") || h.toLowerCase().includes("mslp"));
-const windIdx = headers.findIndex(h => h.toLowerCase().includes("wind"));
 
-const lat = parseFloat(cols[latIdx]);
-const lon = parseFloat(cols[lonIdx]);
-const pressure = parseFloat(cols[pressureIdx]);
-const wind = parseFloat(cols[windIdx]);
+        const latIdx = headers.findIndex(h => h.toLowerCase().includes("lat"));
+        const lonIdx = headers.findIndex(h => h.toLowerCase().includes("lon"));
+        const pressureIdx = headers.findIndex(h => h.toLowerCase().includes("pressure") || h.toLowerCase().includes("mslp"));
+        const windIdx = headers.findIndex(h => h.toLowerCase().includes("wind"));
+
+        const lat = parseFloat(cols[latIdx]);
+        const lon = parseFloat(cols[lonIdx]);
+        const pressure = parseFloat(cols[pressureIdx]);
+        const wind = parseFloat(cols[windIdx]);
+
         const r34 = maxNum([cols[10],cols[11],cols[12],cols[13]]);
         const r50 = maxNum([cols[14],cols[15],cols[16],cols[17]]);
         const r64 = maxNum([cols[18],cols[19],cols[20],cols[21]]);
@@ -300,9 +300,7 @@ const wind = parseFloat(cols[windIdx]);
 
       const impactWindow = winStart === "-" ? "-" : `${winStart} → ${winEnd}`;
 
-      const worstTracks = tracks
-        .sort((a,b)=>a.closest-b.closest)
-        .slice(0,10);
+      const worstTracks = tracks.sort((a,b)=>a.closest-b.closest).slice(0,10);
 
       const worstText = worstTracks.map((t,i)=>
 `#${i+1}
@@ -362,7 +360,7 @@ ${overall === "LOW" ? "Most ensemble members stay far from Hong Kong in this run
       document.getElementById("explain").innerText = explanation;
       document.getElementById("worst").innerText = worstText || "No tracks found.";
 
-      const summary =
+      document.getElementById("summary").value =
 `🌪 HK Typhoon AI Forecast V8
 
 Source: Google WeatherNext FNV3 Ensemble
@@ -405,7 +403,6 @@ Distance Distribution:
 
 Note: AI estimate only. Not official HKO warning.`;
 
-      document.getElementById("summary").value = summary;
       document.getElementById("telegramStatus").innerText = "Telegram: Ready to send";
 
     }catch(err){
@@ -416,10 +413,9 @@ Note: AI estimate only. Not official HKO warning.`;
 
   reader.readAsText(file);
 }
+
 async function loadLatestGoogleCSV(){
   document.getElementById("status").innerText = "Auto downloading Google CSV...";
-
-  const TELEGRAM_WORKER_URL = "https://hk-typhoon-telegram.jones1985624.workers.dev";
 
   function pad(n){ return String(n).padStart(2,"0"); }
 
@@ -487,8 +483,44 @@ async function loadLatestGoogleCSV(){
     document.getElementById("status").innerText = "Auto CSV Failed";
 
   }catch(err){
-  alert("Auto CSV Error: " + err.message);
-  document.getElementById("status").innerText = "Auto CSV Error";
+    alert("Auto CSV Error: " + err.message);
+    document.getElementById("status").innerText = "Auto CSV Error";
+  }
+}
+
+function copySummary(){
+  const txt = document.getElementById("summary");
+  txt.select();
+  document.execCommand("copy");
+  alert("Copied");
+}
+
+async function sendTelegram(){
+  const message = document.getElementById("summary").value;
+  if(!message.trim()){
+    alert("No summary yet. Run analysis first.");
+    return;
+  }
+
+  document.getElementById("telegramStatus").innerText = "Telegram: Sending...";
+
+  try{
+    const res = await fetch(TELEGRAM_WORKER_URL, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ text:message })
+    });
+
+    if(!res.ok){
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    document.getElementById("telegramStatus").innerText = "Telegram: Sent";
+    alert("Telegram sent");
+  }catch(err){
+    document.getElementById("telegramStatus").innerText = "Telegram: Failed";
+    alert("Telegram Error: " + err.message);
   }
 }
 </script>
