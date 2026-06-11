@@ -173,12 +173,10 @@ function readCSV(){
 
         const cols = line.split(",");
 
-        if(headers.length === 0){
-          headers = cols;
-
-          console.log(headers);
-alert(headers.join("\n"));          continue;
-        }
+      if(headers.length === 0){
+  headers = cols;
+  continue;
+}
 
         if(cols.length < 22) continue;
 
