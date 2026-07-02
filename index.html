@@ -282,7 +282,7 @@ function directionText(lat1,lon1,lat2,lon2){
 
 function readCSV(){
   const file = document.getElementById("csvFile").files[0];
-  if(!file){ alert("Select CSV first"); return; }
+if(!file && !window.autoCsvText){ alert("Select CSV first"); return; }
 
   document.getElementById("status").innerText = "Reading...";
 
@@ -290,7 +290,7 @@ function readCSV(){
 
   reader.onload = function(e){
     try{
-      const text = e.target.result;
+      const text = window.autoCsvText || e.target.result;
       const lines = text.split(/\r?\n/);
 
       let dataStarted = false;
@@ -637,7 +637,7 @@ async function loadLatestGoogleCSV(){
       }
 
       const text = await res.text();
-
+      window.autoCsvText = text;
       if(!text.includes("# BEGIN DATA")){
         tried.push(url + " => invalid csv");
         continue;
