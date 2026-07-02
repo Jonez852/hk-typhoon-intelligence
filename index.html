@@ -3,84 +3,198 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HK Typhoon Intelligence V8</title>
+<title>HK Typhoon Intelligence V10</title>
 <style>
-body{font-family:Arial;background:#0f172a;color:white;padding:20px}
-h1{text-align:center;font-size:30px}
-.card{background:#1e293b;padding:18px;border-radius:14px;margin-bottom:18px}
-button{width:100%;padding:14px;margin-top:12px;background:#2563eb;color:white;border:0;border-radius:10px;font-size:18px;font-weight:bold}
-input{width:100%;padding:10px}
-.result{font-size:21px;font-weight:bold;margin:11px 0}
+*{box-sizing:border-box}
+body{
+  font-family:Arial,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:radial-gradient(circle at top,#1e3a8a 0,#0f172a 35%,#020617 100%);
+  color:white;
+  padding:16px;
+  margin:0;
+}
+h1{text-align:center;font-size:30px;margin:14px 0 6px}
+h2{margin:0 0 14px;font-size:22px}
+.card{
+  background:rgba(30,41,59,.88);
+  padding:18px;
+  border-radius:18px;
+  margin-bottom:16px;
+  border:1px solid rgba(148,163,184,.22);
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+  backdrop-filter:blur(10px);
+}
+.hero{
+  background:linear-gradient(135deg,#1d4ed8,#0f172a);
+  border:1px solid #60a5fa;
+}
+.version{text-align:center;color:#cbd5e1;font-size:13px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.kpi{
+  background:#020617;
+  border:1px solid #334155;
+  border-radius:14px;
+  padding:14px;
+}
+.kpi .label{font-size:13px;color:#94a3b8;margin-bottom:6px}
+.kpi .value{font-size:22px;font-weight:800}
+.result{font-size:19px;font-weight:bold;margin:10px 0}
 .small{font-size:14px;color:#cbd5e1;line-height:1.4}
 .low{color:#22c55e}.mid{color:#facc15}.high{color:#fb923c}.danger{color:#ef4444}.extreme{color:#c084fc}
-textarea{width:100%;height:320px;background:#020617;color:white;border:1px solid #334155;border-radius:10px;padding:10px;font-size:15px}
-pre{white-space:pre-wrap;background:#020617;border-radius:10px;padding:12px;color:#e2e8f0;font-size:14px}
-hr{border:0;border-top:1px solid #64748b}
+button{
+  width:100%;
+  padding:15px;
+  margin-top:12px;
+  background:linear-gradient(135deg,#2563eb,#1d4ed8);
+  color:white;
+  border:0;
+  border-radius:14px;
+  font-size:17px;
+  font-weight:bold;
+}
+input{width:100%;padding:10px;border-radius:10px;border:0}
+textarea{
+  width:100%;
+  height:300px;
+  background:#020617;
+  color:white;
+  border:1px solid #334155;
+  border-radius:12px;
+  padding:12px;
+  font-size:14px;
+}
+pre{
+  white-space:pre-wrap;
+  background:#020617;
+  border-radius:12px;
+  padding:12px;
+  color:#e2e8f0;
+  font-size:14px;
+  overflow:auto;
+}
+hr{border:0;border-top:1px solid #475569;margin:16px 0}
+details{
+  background:rgba(15,23,42,.65);
+  border:1px solid #334155;
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:16px;
+}
+summary{
+  cursor:pointer;
+  font-size:20px;
+  font-weight:800;
+}
+.barWrap{margin:12px 0}
+.barLabel{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;color:#cbd5e1}
+.barBg{height:12px;background:#020617;border-radius:999px;overflow:hidden;border:1px solid #334155}
+.barFill{height:100%;width:0%;background:linear-gradient(90deg,#22c55e,#facc15,#fb923c,#ef4444);border-radius:999px}
+.badge{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:999px;
+  background:#020617;
+  border:1px solid #334155;
+  margin:4px 4px 0 0;
+  font-size:13px;
+}
+@media(max-width:700px){
+  body{padding:12px}
+  .grid{grid-template-columns:1fr}
+  h1{font-size:26px}
+  .kpi .value{font-size:20px}
+}
 </style>
 </head>
 <body>
 
-<h1>🌪 HK Typhoon Intelligence V8</h1>
+<h1>🌪 HK Typhoon Intelligence V10</h1>
+<div class="version">AI estimate only · Not official HKO warning</div>
 
+<div class="card hero">
+  <h2>🌀 Storm Dashboard</h2>
+  <div class="grid">
+    <div class="kpi"><div class="label">Storm</div><div class="value" id="stormName">-</div></div>
+    <div class="kpi"><div class="label">Type</div><div class="value" id="stormType">-</div></div>
+    <div class="kpi"><div class="label">Position</div><div class="value" id="stormPos">-</div></div>
+    <div class="kpi"><div class="label">Movement</div><div class="value" id="stormMove">-</div></div>
+    <div class="kpi"><div class="label">Max Wind</div><div class="value" id="stormWind">-</div></div>
+    <div class="kpi"><div class="label">Central Pressure</div><div class="value" id="stormPressure">-</div></div>
+  </div>
+</div>
+
+<details open>
+<summary>📂 Upload / Auto Download</summary>
 <div class="card">
 <h2>Upload FNV3 Ensemble CSV</h2>
 <input type="file" id="csvFile" accept=".csv">
 <button onclick="readCSV()">Analyze HK Typhoon Risk</button>
 <button onclick="loadLatestGoogleCSV()">Auto Download Latest Google CSV</button>
-<p class="small">AI estimate only. Not official HKO warning.</p>
+<p class="small">Google WeatherNext FNV3 Ensemble · AI estimate only.</p>
 </div>
+</details>
 
 <div class="card">
-<h2>HKO-style Signal Risk</h2>
+<h2>🚦 HKO-style Signal Risk</h2>
 <div class="result">Status: <span id="status">Waiting</span></div>
 <div class="result">Overall Risk: <span id="overall">-</span></div>
 <hr>
-<div class="result">T1 Risk: <span id="t1">0%</span></div>
-<div class="result">T3 Risk: <span id="t3">0%</span></div>
-<div class="result">T8 Risk: <span id="t8">0%</span></div>
-<div class="result">T9 Risk: <span id="t9">0%</span></div>
-<div class="result">T10 Risk: <span id="t10">0%</span></div>
-<hr>
-<div class="result">Impact Window: <span id="window">-</span></div>
-<div class="result">Closest Distance: <span id="closest">-</span></div>
-<div class="result">Closest Time: <span id="ctime">-</span></div>
-<div class="result">Max Wind: <span id="wind">-</span></div>
-<div class="result">Lowest Pressure: <span id="pressure">-</span></div>
+<div class="grid">
+  <div class="kpi"><div class="label">T1 Risk</div><div class="value" id="t1">0%</div></div>
+  <div class="kpi"><div class="label">T3 Risk</div><div class="value" id="t3">0%</div></div>
+  <div class="kpi"><div class="label">T8 Risk</div><div class="value" id="t8">0%</div></div>
+  <div class="kpi"><div class="label">T9 Risk</div><div class="value" id="t9">0%</div></div>
+  <div class="kpi"><div class="label">T10 Risk</div><div class="value" id="t10">0%</div></div>
+</div>
 </div>
 
 <div class="card">
-<h2>Distance Percentiles</h2>
+<h2>📊 Ensemble Statistics</h2>
+<div class="grid">
+  <div class="kpi"><div class="label">Impact Window</div><div class="value" id="window">-</div></div>
+  <div class="kpi"><div class="label">Closest Distance</div><div class="value" id="closest">-</div></div>
+  <div class="kpi"><div class="label">Closest Time</div><div class="value" id="ctime">-</div></div>
+  <div class="kpi"><div class="label">Max Wind</div><div class="value" id="wind">-</div></div>
+  <div class="kpi"><div class="label">Lowest Pressure</div><div class="value" id="pressure">-</div></div>
+  <div class="kpi"><div class="label">Members / Rows</div><div class="value"><span id="tracks">0</span> / <span id="rows">0</span></div></div>
+</div>
+</div>
+
+<details open>
+<summary>📏 Distance Distribution</summary>
+<div class="card">
+<div class="barWrap"><div class="barLabel"><span>0-200km</span><span id="d200">0</span></div><div class="barBg"><div class="barFill" id="bar200"></div></div></div>
+<div class="barWrap"><div class="barLabel"><span>200-400km</span><span id="d400">0</span></div><div class="barBg"><div class="barFill" id="bar400"></div></div></div>
+<div class="barWrap"><div class="barLabel"><span>400-800km</span><span id="d800">0</span></div><div class="barBg"><div class="barFill" id="bar800"></div></div></div>
+<div class="barWrap"><div class="barLabel"><span>800km+</span><span id="d999">0</span></div><div class="barBg"><div class="barFill" id="bar999"></div></div></div>
+</div>
+</details>
+
+<details>
+<summary>📈 Distance Percentiles</summary>
+<div class="card">
 <div class="result">P50 Distance: <span id="p50">-</span></div>
 <div class="result">P10 Distance: <span id="p10">-</span></div>
 <div class="result">P01 Distance: <span id="p01">-</span></div>
 </div>
+</details>
 
+<details>
+<summary>🧠 Risk Explanation</summary>
 <div class="card">
-<h2>Distance Distribution</h2>
-<div class="result">0-200km: <span id="d200">0</span></div>
-<div class="result">200-400km: <span id="d400">0</span></div>
-<div class="result">400-800km: <span id="d800">0</span></div>
-<div class="result">800km+: <span id="d999">0</span></div>
-</div>
-
-<div class="card">
-<h2>Risk Explanation</h2>
 <pre id="explain">Waiting for CSV...</pre>
 </div>
+</details>
 
+<details>
+<summary>🔥 Top 10 Worst Tracks</summary>
 <div class="card">
-<h2>Top 10 Worst Tracks</h2>
 <pre id="worst">Waiting for CSV...</pre>
 </div>
+</details>
 
 <div class="card">
-<h2>System Stats</h2>
-<div class="result">Total Members: <span id="tracks">0</span></div>
-<div class="result">Rows: <span id="rows">0</span></div>
-</div>
-
-<div class="card">
-<h2>WhatsApp / Telegram Summary</h2>
+<h2>📲 WhatsApp / Telegram Summary</h2>
 <textarea id="summary" readonly></textarea>
 <button onclick="copySummary()">Copy Summary</button>
 <button onclick="sendTelegram()">Send Telegram Alert</button>
@@ -107,6 +221,15 @@ function distKm(lat1, lon1, lat2, lon2){
 function pct(n,total){
   if(!total) return "0%";
   return ((n/total)*100).toFixed(1) + "%";
+}
+
+function pctNum(n,total){
+  if(!total) return 0;
+  return Math.min(100, Math.max(0, (n/total)*100));
+}
+
+function setBar(id,n,total){
+  document.getElementById(id).style.width = pctNum(n,total).toFixed(1) + "%";
 }
 
 function maxNum(arr){
@@ -136,6 +259,27 @@ function percentile(sortedArr, p){
   return sortedArr[idx];
 }
 
+function stormTypeFromWindKt(wind){
+  if(!isFinite(wind)) return "-";
+  const kmh = wind * 1.852;
+  if(kmh < 41) return "Low Pressure";
+  if(kmh < 63) return "Tropical Depression";
+  if(kmh < 88) return "Tropical Storm";
+  if(kmh < 118) return "Severe Tropical Storm";
+  if(kmh < 150) return "Typhoon";
+  if(kmh < 185) return "Severe Typhoon";
+  return "Super Typhoon";
+}
+
+function directionText(lat1,lon1,lat2,lon2){
+  if(!isFinite(lat1)||!isFinite(lon1)||!isFinite(lat2)||!isFinite(lon2)) return "-";
+  const dLat = lat2-lat1;
+  const dLon = lon2-lon1;
+  let ns = dLat > 0 ? "N" : dLat < 0 ? "S" : "";
+  let ew = dLon > 0 ? "E" : dLon < 0 ? "W" : "";
+  return (ns+ew) || "-";
+}
+
 function readCSV(){
   const file = document.getElementById("csvFile").files[0];
   if(!file){ alert("Select CSV first"); return; }
@@ -158,6 +302,9 @@ function readCSV(){
       let globalClosestTime = "-";
       let maxWind = -Infinity;
       let minPressure = Infinity;
+      let firstPoint = null;
+      let lastPoint = null;
+      let latestTime = "-";
 
       for(const line of lines){
         if(!line.trim()) continue;
@@ -182,9 +329,10 @@ function readCSV(){
         const validTime = cols[3];
 
         const latIdx = 5;
-const lonIdx = 6;
-const pressureIdx = 7;
-const windIdx = 8;
+        const lonIdx = 6;
+        const pressureIdx = 7;
+        const windIdx = 8;
+
         const lat = parseFloat(cols[latIdx]);
         const lon = parseFloat(cols[lonIdx]);
         const pressure = parseFloat(cols[pressureIdx]);
@@ -196,6 +344,10 @@ const windIdx = 8;
 
         if(isNaN(lat) || isNaN(lon)) continue;
         rows++;
+
+        if(!firstPoint) firstPoint = {lat,lon,time:validTime};
+        lastPoint = {lat,lon,time:validTime};
+        latestTime = later(latestTime, validTime);
 
         const d = distKm(HK_LAT, HK_LON, lat, lon);
 
@@ -211,11 +363,16 @@ const windIdx = 8;
             maxR64:0,
             t1:false,t3:false,t8:false,t9:false,t10:false,
             impactStart:"-",
-            impactEnd:"-"
+            impactEnd:"-",
+            first:null,
+            last:null
           });
         }
 
         const t = trackMap.get(sample);
+
+        if(!t.first) t.first = {lat,lon,time:validTime};
+        t.last = {lat,lon,time:validTime};
 
         if(d < t.closest){
           t.closest = d;
@@ -298,8 +455,22 @@ const windIdx = 8;
       else if(p1 >= 0.25){ overall = "T1 POSSIBLE"; cls = "mid"; }
 
       const impactWindow = winStart === "-" ? "-" : `${winStart} → ${winEnd}`;
-
       const worstTracks = tracks.sort((a,b)=>a.closest-b.closest).slice(0,10);
+      const bestTrack = worstTracks[0] || null;
+
+      const displayLat = bestTrack?.last?.lat ?? lastPoint?.lat;
+      const displayLon = bestTrack?.last?.lon ?? lastPoint?.lon;
+      const moveDir = bestTrack && bestTrack.first && bestTrack.last
+        ? directionText(bestTrack.first.lat,bestTrack.first.lon,bestTrack.last.lat,bestTrack.last.lon)
+        : "-";
+
+      document.getElementById("stormName").innerText = bestTrack ? `Member ${bestTrack.sample}` : "-";
+      document.getElementById("stormType").innerText = stormTypeFromWindKt(maxWind);
+      document.getElementById("stormPos").innerText =
+        isFinite(displayLat) && isFinite(displayLon) ? `${displayLat.toFixed(1)}°N ${displayLon.toFixed(1)}°E` : "-";
+      document.getElementById("stormMove").innerText = moveDir;
+      document.getElementById("stormWind").innerText = isFinite(maxWind) ? `${(maxWind*1.852).toFixed(0)} km/h` : "-";
+      document.getElementById("stormPressure").innerText = isFinite(minPressure) ? `${minPressure.toFixed(1)} hPa` : "-";
 
       const worstText = worstTracks.map((t,i)=>
 `#${i+1}
@@ -353,18 +524,26 @@ ${overall === "LOW" ? "Most ensemble members stay far from Hong Kong in this run
       document.getElementById("d800").innerText = `${d800} (${pct(d800,total)})`;
       document.getElementById("d999").innerText = `${d999} (${pct(d999,total)})`;
 
+      setBar("bar200",d200,total);
+      setBar("bar400",d400,total);
+      setBar("bar800",d800,total);
+      setBar("bar999",d999,total);
+
       document.getElementById("tracks").innerText = total;
       document.getElementById("rows").innerText = rows;
-
       document.getElementById("explain").innerText = explanation;
       document.getElementById("worst").innerText = worstText || "No tracks found.";
 
       document.getElementById("summary").value =
-`🌪 HK Typhoon AI Forecast V8
+`🌪 HK Typhoon AI Forecast V10
 
 Source: Google WeatherNext FNV3 Ensemble
 Members: ${total}
 Rows: ${rows}
+
+Storm Type: ${stormTypeFromWindKt(maxWind)}
+Position: ${isFinite(displayLat) && isFinite(displayLon) ? `${displayLat.toFixed(1)}N ${displayLon.toFixed(1)}E` : "-"}
+Movement: ${moveDir}
 
 Overall Risk: ${overall}
 
@@ -389,7 +568,7 @@ P10: ${p10 === "-" ? "-" : p10.toFixed(0)+" km"}
 P01: ${p01 === "-" ? "-" : p01.toFixed(0)+" km"}
 
 Max Wind:
-${isFinite(maxWind) ? maxWind.toFixed(1)+" kt" : "-"}
+${isFinite(maxWind) ? maxWind.toFixed(1)+" kt / "+(maxWind*1.852).toFixed(0)+" km/h" : "-"}
 
 Lowest Pressure:
 ${isFinite(minPressure) ? minPressure.toFixed(1)+" hPa" : "-"}
