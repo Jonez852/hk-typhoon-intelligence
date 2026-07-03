@@ -334,9 +334,8 @@ alert(headers.join("\n"));    // 必須真係係Google CSV header
 
         if(cols.length < 22) continue;
 
-        const sample = cols[2];
-        const validTime = cols[3];
-
+        const sample = cols[headers.indexOf("sample")];
+const validTime = cols[headers.indexOf("valid_time")];
         const latIdx = headers.findIndex(h => h.toLowerCase().includes("lat"));
 const lonIdx = headers.findIndex(h => h.toLowerCase().includes("lon"));
 const pressureIdx = headers.findIndex(h => h.toLowerCase().includes("pressure") || h.toLowerCase().includes("mslp"));
