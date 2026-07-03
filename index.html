@@ -3,9 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>HK Typhoon Intelligence V10</title>
+
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
+
 body{
   font-family:Arial,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:radial-gradient(circle at top,#1e3a8a 0,#0f172a 35%,#020617 100%);
@@ -13,8 +18,22 @@ body{
   padding:16px;
   margin:0;
 }
-h1{text-align:center;font-size:30px;margin:14px 0 6px}
-h2{margin:0 0 14px;font-size:22px}
+
+h1{
+  text-align:center;
+  font-size:30px;
+  margin:14px 0 6px;
+}
+
+h2{
+  margin:0 0 14px;
+  font-size:22px;
+}
+
+h3{
+  margin:0 0 14px;
+}
+
 .card{
   background:rgba(30,41,59,.88);
   padding:18px;
@@ -24,23 +43,75 @@ h2{margin:0 0 14px;font-size:22px}
   box-shadow:0 10px 30px rgba(0,0,0,.25);
   backdrop-filter:blur(10px);
 }
+
 .hero{
   background:linear-gradient(135deg,#1d4ed8,#0f172a);
   border:1px solid #60a5fa;
 }
-.version{text-align:center;color:#cbd5e1;font-size:13px;margin-bottom:14px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+.version{
+  text-align:center;
+  color:#cbd5e1;
+  font-size:13px;
+  margin-bottom:14px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
 .kpi{
   background:#020617;
   border:1px solid #334155;
   border-radius:14px;
   padding:14px;
 }
-.kpi .label{font-size:13px;color:#94a3b8;margin-bottom:6px}
-.kpi .value{font-size:22px;font-weight:800}
-.result{font-size:19px;font-weight:bold;margin:10px 0}
-.small{font-size:14px;color:#cbd5e1;line-height:1.4}
-.low{color:#22c55e}.mid{color:#facc15}.high{color:#fb923c}.danger{color:#ef4444}.extreme{color:#c084fc}
+
+.kpi .label{
+  font-size:13px;
+  color:#94a3b8;
+  margin-bottom:6px;
+}
+
+.kpi .value{
+  font-size:22px;
+  font-weight:800;
+}
+
+.result{
+  font-size:19px;
+  font-weight:bold;
+  margin:10px 0;
+}
+
+.small{
+  font-size:14px;
+  color:#cbd5e1;
+  line-height:1.4;
+}
+
+.low{
+  color:#22c55e;
+}
+
+.mid{
+  color:#facc15;
+}
+
+.high{
+  color:#fb923c;
+}
+
+.danger{
+  color:#ef4444;
+}
+
+.extreme{
+  color:#c084fc;
+}
+
 button{
   width:100%;
   padding:15px;
@@ -51,8 +122,20 @@ button{
   border-radius:14px;
   font-size:17px;
   font-weight:bold;
+  cursor:pointer;
 }
-input{width:100%;padding:10px;border-radius:10px;border:0}
+
+button:active{
+  transform:scale(.99);
+}
+
+input{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:0;
+}
+
 textarea{
   width:100%;
   height:300px;
@@ -63,6 +146,7 @@ textarea{
   padding:12px;
   font-size:14px;
 }
+
 pre{
   white-space:pre-wrap;
   background:#020617;
@@ -72,7 +156,13 @@ pre{
   font-size:14px;
   overflow:auto;
 }
-hr{border:0;border-top:1px solid #475569;margin:16px 0}
+
+hr{
+  border:0;
+  border-top:1px solid #475569;
+  margin:16px 0;
+}
+
 details{
   background:rgba(15,23,42,.65);
   border:1px solid #334155;
@@ -80,15 +170,46 @@ details{
   padding:14px;
   margin-bottom:16px;
 }
+
 summary{
   cursor:pointer;
   font-size:20px;
   font-weight:800;
 }
-.barWrap{margin:12px 0}
-.barLabel{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;color:#cbd5e1}
-.barBg{height:12px;background:#020617;border-radius:999px;overflow:hidden;border:1px solid #334155}
-.barFill{height:100%;width:0%;background:linear-gradient(90deg,#22c55e,#facc15,#fb923c,#ef4444);border-radius:999px}
+
+.barWrap{
+  margin:12px 0;
+}
+
+.barLabel{
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+  margin-bottom:6px;
+  color:#cbd5e1;
+}
+
+.barBg{
+  height:12px;
+  background:#020617;
+  border-radius:999px;
+  overflow:hidden;
+  border:1px solid #334155;
+}
+
+.barFill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(
+    90deg,
+    #22c55e,
+    #facc15,
+    #fb923c,
+    #ef4444
+  );
+  border-radius:999px;
+}
+
 .badge{
   display:inline-block;
   padding:6px 10px;
@@ -98,430 +219,1275 @@ summary{
   margin:4px 4px 0 0;
   font-size:13px;
 }
+
+#officialHKO{
+  margin-top:12px;
+  margin-bottom:16px;
+}
+
 @media(max-width:700px){
-  body{padding:12px}
-  .grid{grid-template-columns:1fr}
-  h1{font-size:26px}
-  .kpi .value{font-size:20px}
+  body{
+    padding:12px;
+  }
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  h1{
+    font-size:26px;
+  }
+
+  .kpi .value{
+    font-size:20px;
+  }
 }
 </style>
 </head>
+
 <body>
 
 <h1>🌪 HK Typhoon Intelligence V10</h1>
-<div class="version">AI estimate only · Not official HKO warning</div>
+
+<div class="version">
+  AI estimate only · Not official HKO warning
+</div>
 
 <div class="card hero">
+
   <h2>🌀 Storm Dashboard</h2>
+
   <div class="card" id="officialHKO">
+
     <h3>🏛 Official HKO</h3>
 
     <div class="grid">
-        <div class="kp1">
-            <div class="label">Current Signal</div>
-            <div class="value" id="hkoSignal">Loading...</div>
-        </div>
 
-        <div class="kp1">
-            <div class="label">Last Update</div>
-            <div class="value" id="hkoUpdate">--</div>
-        </div>
+      <div class="kpi">
+        <div class="label">Current Signal</div>
+        <div class="value" id="hkoSignal">Loading...</div>
+      </div>
+
+      <div class="kpi">
+        <div class="label">Last Update</div>
+        <div class="value" id="hkoUpdate">--</div>
+      </div>
+
     </div>
-</div>
-  <div class="grid">
-    <div class="kpi"><div class="label">Storm</div><div class="value" id="stormName">-</div></div>
-    <div class="kpi"><div class="label">Type</div><div class="value" id="stormType">-</div></div>
-    <div class="kpi"><div class="label">Position</div><div class="value" id="stormPos">-</div></div>
-    <div class="kpi"><div class="label">Movement</div><div class="value" id="stormMove">-</div></div>
-    <div class="kpi"><div class="label">Max Wind</div><div class="value" id="stormWind">-</div></div>
-    <div class="kpi"><div class="label">Central Pressure</div><div class="value" id="stormPressure">-</div></div>
+
   </div>
+
+  <div class="grid">
+
+    <div class="kpi">
+      <div class="label">Storm</div>
+      <div class="value" id="stormName">-</div>
+    </div>
+
+    <div class="kpi">
+      <div class="label">Type</div>
+      <div class="value" id="stormType">-</div>
+    </div>
+
+    <div class="kpi">
+      <div class="label">Position</div>
+      <div class="value" id="stormPos">-</div>
+    </div>
+
+    <div class="kpi">
+      <div class="label">Movement</div>
+      <div class="value" id="stormMove">-</div>
+    </div>
+
+    <div class="kpi">
+      <div class="label">Max Wind</div>
+      <div class="value" id="stormWind">-</div>
+    </div>
+
+    <div class="kpi">
+      <div class="label">Central Pressure</div>
+      <div class="value" id="stormPressure">-</div>
+    </div>
+
+  </div>
+
 </div>
 
 <details open>
-<summary>📂 Upload / Auto Download</summary>
-<div class="card">
-<h2>Upload FNV3 Ensemble CSV</h2>
-<input type="file" id="csvFile" accept=".csv">
-<button onclick="readCSV()">Analyze HK Typhoon Risk</button>
-<button onclick="loadLatestGoogleCSV()">Auto Download Latest Google CSV</button>
-<p class="small">Google WeatherNext FNV3 Ensemble · AI estimate only.</p>
-</div>
+
+  <summary>📂 Upload / Auto Download</summary>
+
+  <div class="card">
+
+    <h2>Upload FNV3 Ensemble CSV</h2>
+
+    <input
+      type="file"
+      id="csvFile"
+      accept=".csv"
+    >
+
+    <button onclick="readCSV()">
+      Analyze HK Typhoon Risk
+    </button>
+
+    <button onclick="loadLatestGoogleCSV()">
+      Auto Download Latest Google CSV
+    </button>
+
+    <p class="small">
+      Google WeatherNext FNV3 Ensemble · AI estimate only.
+    </p>
+
+  </div>
+
 </details>
 
 <div class="card">
-<h2>🚦 HKO-style Signal Risk</h2>
-<div class="result">Status: <span id="status">Waiting</span></div>
-<div class="result">Overall Risk: <span id="overall">-</span></div>
-<hr>
-<div class="grid">
-  <div class="kpi"><div class="label">T1 Risk</div><div class="value" id="t1">0%</div></div>
-  <div class="kpi"><div class="label">T3 Risk</div><div class="value" id="t3">0%</div></div>
-  <div class="kpi"><div class="label">T8 Risk</div><div class="value" id="t8">0%</div></div>
-  <div class="kpi"><div class="label">T9 Risk</div><div class="value" id="t9">0%</div></div>
-  <div class="kpi"><div class="label">T10 Risk</div><div class="value" id="t10">0%</div></div>
-</div>
+
+  <h2>🚦 HKO-style Signal Risk</h2>
+
+  <div class="result">
+    Status:
+    <span id="status">Waiting</span>
+  </div>
+
+  <div class="result">
+    Overall Risk:
+    <span id="overall">-</span>
+  </div>
+
+  <hr>
+
+  <div class="grid">
+
+    <div class="kpi">
+      <div class="label">Model T1 Support</div>
+      <div class="value" id="t1">0%</div>
+    </div>
+
+    <div class="kpi">
+      <div class="label">Model T3 Support</div>
+      <div class="value" id="t3">0%</div>
+    </div>
+
+    <div class="kpi">
+      <div class="label">Model T8 Support</div>
+      <div class="value" id="t8">0%</div>
+    </div>
+
+    <div class="kpi">
+      <div class="label">Model T9 Support</div>
+      <div class="value" id="t9">0%</div>
+    </div>
+
+    <div class="kpi">
+      <div class="label">Model T10 Support</div>
+      <div class="value" id="t10">0%</div>
+    </div>
+
+  </div>
+
 </div>
 
 <div class="card">
-<h2>📊 Ensemble Statistics</h2>
-<div class="grid">
-  <div class="kpi"><div class="label">Impact Window</div><div class="value" id="window">-</div></div>
-  <div class="kpi"><div class="label">Closest Distance</div><div class="value" id="closest">-</div></div>
-  <div class="kpi"><div class="label">Closest Time</div><div class="value" id="ctime">-</div></div>
-  <div class="kpi"><div class="label">Max Wind</div><div class="value" id="wind">-</div></div>
-  <div class="kpi"><div class="label">Lowest Pressure</div><div class="value" id="pressure">-</div></div>
-  <div class="kpi"><div class="label">Members / Rows</div><div class="value"><span id="tracks">0</span> / <span id="rows">0</span></div></div>
-</div>
+
+  <h2>📊 Ensemble Statistics</h2>
+
+  <div class="grid">
+
+    <div class="kpi">
+      <div class="label">Impact Window</div>
+      <div class="value" id="window">-</div>
+    </div>
+
+    <div class="kpi">
+      <div class="label">Closest Distance</div>
+      <div class="value" id="closest">-</div>
+    </div>
+
+    <div class="kpi">
+      <div class="label">Closest Time</div>
+      <div class="value" id="ctime">-</div>
+    </div>
+
+    <div class="kpi">
+      <div class="label">Max Wind</div>
+      <div class="value" id="wind">-</div>
+    </div>
+
+    <div class="kpi">
+      <div class="label">Lowest Pressure</div>
+      <div class="value" id="pressure">-</div>
+    </div>
+
+    <div class="kpi">
+      <div class="label">Members / Rows</div>
+
+      <div class="value">
+        <span id="tracks">0</span>
+        /
+        <span id="rows">0</span>
+      </div>
+    </div>
+
+  </div>
+
 </div>
 
 <details open>
-<summary>📏 Distance Distribution</summary>
-<div class="card">
-<div class="barWrap"><div class="barLabel"><span>0-200km</span><span id="d200">0</span></div><div class="barBg"><div class="barFill" id="bar200"></div></div></div>
-<div class="barWrap"><div class="barLabel"><span>200-400km</span><span id="d400">0</span></div><div class="barBg"><div class="barFill" id="bar400"></div></div></div>
-<div class="barWrap"><div class="barLabel"><span>400-800km</span><span id="d800">0</span></div><div class="barBg"><div class="barFill" id="bar800"></div></div></div>
-<div class="barWrap"><div class="barLabel"><span>800km+</span><span id="d999">0</span></div><div class="barBg"><div class="barFill" id="bar999"></div></div></div>
-</div>
+
+  <summary>📏 Distance Distribution</summary>
+
+  <div class="card">
+
+    <div class="barWrap">
+
+      <div class="barLabel">
+        <span>0-200km</span>
+        <span id="d200">0</span>
+      </div>
+
+      <div class="barBg">
+        <div class="barFill" id="bar200"></div>
+      </div>
+
+    </div>
+
+    <div class="barWrap">
+
+      <div class="barLabel">
+        <span>200-400km</span>
+        <span id="d400">0</span>
+      </div>
+
+      <div class="barBg">
+        <div class="barFill" id="bar400"></div>
+      </div>
+
+    </div>
+
+    <div class="barWrap">
+
+      <div class="barLabel">
+        <span>400-800km</span>
+        <span id="d800">0</span>
+      </div>
+
+      <div class="barBg">
+        <div class="barFill" id="bar800"></div>
+      </div>
+
+    </div>
+
+    <div class="barWrap">
+
+      <div class="barLabel">
+        <span>800km+</span>
+        <span id="d999">0</span>
+      </div>
+
+      <div class="barBg">
+        <div class="barFill" id="bar999"></div>
+      </div>
+
+    </div>
+
+  </div>
+
 </details>
 
 <details>
-<summary>📈 Distance Percentiles</summary>
-<div class="card">
-<div class="result">P50 Distance: <span id="p50">-</span></div>
-<div class="result">P10 Distance: <span id="p10">-</span></div>
-<div class="result">P01 Distance: <span id="p01">-</span></div>
-</div>
+
+  <summary>📈 Distance Percentiles</summary>
+
+  <div class="card">
+
+    <div class="result">
+      P50 Distance:
+      <span id="p50">-</span>
+    </div>
+
+    <div class="result">
+      P10 Distance:
+      <span id="p10">-</span>
+    </div>
+
+    <div class="result">
+      P01 Distance:
+      <span id="p01">-</span>
+    </div>
+
+  </div>
+
 </details>
 
 <details>
-<summary>🧠 Risk Explanation</summary>
-<div class="card">
-<pre id="explain">Waiting for CSV...</pre>
-</div>
+
+  <summary>🧠 Risk Explanation</summary>
+
+  <div class="card">
+    <pre id="explain">Waiting for CSV...</pre>
+  </div>
+
 </details>
 
 <details>
-<summary>🔥 Top 10 Worst Tracks</summary>
-<div class="card">
-<pre id="worst">Waiting for CSV...</pre>
-</div>
+
+  <summary>🔥 Top 10 Worst Tracks</summary>
+
+  <div class="card">
+    <pre id="worst">Waiting for CSV...</pre>
+  </div>
+
 </details>
 
 <div class="card">
-<h2>📲 WhatsApp / Telegram Summary</h2>
-<textarea id="summary" readonly></textarea>
-<button onclick="copySummary()">Copy Summary</button>
-<button onclick="sendTelegram()">Send Telegram Alert</button>
-<p class="small" id="telegramStatus">Telegram: Waiting</p>
+
+  <h2>📲 WhatsApp / Telegram Summary</h2>
+
+  <textarea
+    id="summary"
+    readonly
+  ></textarea>
+
+  <button onclick="copySummary()">
+    Copy Summary
+  </button>
+
+  <button onclick="sendTelegram()">
+    Send Telegram Alert
+  </button>
+
+  <p
+    class="small"
+    id="telegramStatus"
+  >
+    Telegram: Waiting
+  </p>
+
 </div>
 
 <script>
+
 const HK_LAT = 22.3193;
 const HK_LON = 114.1694;
-const TELEGRAM_WORKER_URL = "https://hk-typhoon-telegram.jones1985624.workers.dev";
 
-function distKm(lat1, lon1, lat2, lon2){
+const TELEGRAM_WORKER_URL =
+  "https://hk-typhoon-telegram.jones1985624.workers.dev";
+
+function distKm(lat1,lon1,lat2,lon2){
+
   const R = 6371;
-  const dLat = (lat2-lat1) * Math.PI / 180;
-  const dLon = (lon2-lon1) * Math.PI / 180;
+
+  const dLat =
+    (lat2-lat1) * Math.PI / 180;
+
+  const dLon =
+    (lon2-lon1) * Math.PI / 180;
+
   const a =
-    Math.sin(dLat/2)**2 +
+    Math.sin(dLat/2) ** 2 +
     Math.cos(lat1*Math.PI/180) *
     Math.cos(lat2*Math.PI/180) *
-    Math.sin(dLon/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    Math.sin(dLon/2) ** 2;
+
+  return R * 2 *
+    Math.atan2(
+      Math.sqrt(a),
+      Math.sqrt(1-a)
+    );
 }
 
 function pct(n,total){
-  if(!total) return "0%";
+
+  if(!total){
+    return "0%";
+  }
+
   return ((n/total)*100).toFixed(1) + "%";
 }
 
 function pctNum(n,total){
-  if(!total) return 0;
-  return Math.min(100, Math.max(0, (n/total)*100));
+
+  if(!total){
+    return 0;
+  }
+
+  return Math.min(
+    100,
+    Math.max(
+      0,
+      (n/total)*100
+    )
+  );
 }
 
 function setBar(id,n,total){
-  document.getElementById(id).style.width = pctNum(n,total).toFixed(1) + "%";
+
+  document
+    .getElementById(id)
+    .style
+    .width =
+      pctNum(n,total).toFixed(1) + "%";
 }
 
 function maxNum(arr){
+
   let m = 0;
+
   for(const v of arr){
+
     const n = parseFloat(v);
-    if(!isNaN(n) && n > m) m = n;
+
+    if(!isNaN(n) && n > m){
+      m = n;
+    }
   }
+
   return m;
 }
 
 function earlier(a,b){
-  if(a === "-") return b;
-  if(b === "-") return a;
-  return new Date(a) < new Date(b) ? a : b;
+
+  if(a === "-"){
+    return b;
+  }
+
+  if(b === "-"){
+    return a;
+  }
+
+  return new Date(a) < new Date(b)
+    ? a
+    : b;
 }
 
 function later(a,b){
-  if(a === "-") return b;
-  if(b === "-") return a;
-  return new Date(a) > new Date(b) ? a : b;
+
+  if(a === "-"){
+    return b;
+  }
+
+  if(b === "-"){
+    return a;
+  }
+
+  return new Date(a) > new Date(b)
+    ? a
+    : b;
 }
 
-function percentile(sortedArr, p){
-  if(sortedArr.length === 0) return "-";
-  const idx = Math.floor((p/100) * (sortedArr.length - 1));
+function percentile(sortedArr,p){
+
+  if(sortedArr.length === 0){
+    return "-";
+  }
+
+  const idx =
+    Math.floor(
+      (p/100) *
+      (sortedArr.length-1)
+    );
+
   return sortedArr[idx];
 }
 
 function stormTypeFromWindKt(wind){
-  if(!isFinite(wind)) return "-";
+
+  if(!isFinite(wind)){
+    return "-";
+  }
+
   const kmh = wind * 1.852;
-  if(kmh < 41) return "Low Pressure";
-  if(kmh < 63) return "Tropical Depression";
-  if(kmh < 88) return "Tropical Storm";
-  if(kmh < 118) return "Severe Tropical Storm";
-  if(kmh < 150) return "Typhoon";
-  if(kmh < 185) return "Severe Typhoon";
+
+  if(kmh < 41){
+    return "Low Pressure";
+  }
+
+  if(kmh < 63){
+    return "Tropical Depression";
+  }
+
+  if(kmh < 88){
+    return "Tropical Storm";
+  }
+
+  if(kmh < 118){
+    return "Severe Tropical Storm";
+  }
+
+  if(kmh < 150){
+    return "Typhoon";
+  }
+
+  if(kmh < 185){
+    return "Severe Typhoon";
+  }
+
   return "Super Typhoon";
 }
 
 function directionText(lat1,lon1,lat2,lon2){
-  if(!isFinite(lat1)||!isFinite(lon1)||!isFinite(lat2)||!isFinite(lon2)) return "-";
+
+  if(
+    !isFinite(lat1) ||
+    !isFinite(lon1) ||
+    !isFinite(lat2) ||
+    !isFinite(lon2)
+  ){
+    return "-";
+  }
+
   const dLat = lat2-lat1;
   const dLon = lon2-lon1;
-  let ns = dLat > 0 ? "N" : dLat < 0 ? "S" : "";
-  let ew = dLon > 0 ? "E" : dLon < 0 ? "W" : "";
+
+  const ns =
+    dLat > 0
+      ? "N"
+      : dLat < 0
+        ? "S"
+        : "";
+
+  const ew =
+    dLon > 0
+      ? "E"
+      : dLon < 0
+        ? "W"
+        : "";
+
   return (ns+ew) || "-";
 }
 
 function readCSV(){
-  const file = document.getElementById("csvFile").files[0];
-if(!file && !window.autoCsvText){ alert("Select CSV first"); return; }
 
-  document.getElementById("status").innerText = "Reading...";
+  const file =
+    document
+      .getElementById("csvFile")
+      .files[0];
 
-  const reader = new FileReader();
+  if(!file && !window.autoCsvText){
+
+    alert("Select CSV first");
+
+    return;
+  }
+
+  document
+    .getElementById("status")
+    .innerText =
+      "Reading...";
+
+  const reader =
+    new FileReader();
 
   reader.onload = function(e){
+
     try{
-      const text = window.autoCsvText || e.target.result;
-      const lines = text.split(/\r?\n/);
+
+      const text =
+        window.autoCsvText ||
+        e.target.result;
+
+      const lines =
+        text.split(/\r?\n/);
 
       let dataStarted = false;
       let headers = [];
-      var IDX = null;      
+      let IDX = null;
       let rows = 0;
-      const trackMap = new Map();
 
-      let globalClosest = Infinity;
-      let globalClosestTime = "-";
-      let maxWind = -Infinity;
-      let minPressure = Infinity;
-      let firstPoint = null;
-      let lastPoint = null;
-      let latestTime = "-";
+      const trackMap =
+        new Map();
 
-      for(const line of lines){
-        if(!line.trim()) continue;
+      let globalClosest =
+        Infinity;
 
-        if(line.includes("# BEGIN DATA")){
-          dataStarted = true;
+      let globalClosestTime =
+        "-";
+
+      let maxWind =
+        -Infinity;
+
+      let minPressure =
+        Infinity;
+
+      let firstPoint =
+        null;
+
+      let lastPoint =
+        null;
+
+      let latestTime =
+        "-";
+
+      for(const rawLine of lines){
+
+        const line =
+          rawLine.trim();
+
+        if(!line){
           continue;
         }
 
-        if(!dataStarted || line.startsWith("#")) continue;
+        if(line.includes("# BEGIN DATA")){
 
-        const cols = line.split(",");
+          dataStarted = true;
+
+          continue;
+        }
+
+        if(
+          !dataStarted ||
+          line.startsWith("#")
+        ){
+          continue;
+        }
+
+        const cols =
+          line
+            .split(",")
+            .map(v => v.trim());
 
         if(headers.length === 0){
 
-    // Skip comments
-    if(line.startsWith("#")) continue;
+          headers =
+            cols.map(
+              h => h.replace(/^\uFEFF/,"")
+            );
 
-    headers = cols;
-IDX = {
-  sample: headers.indexOf("sample"),
-  validTime: headers.indexOf("valid_time"),
-  lat: headers.findIndex(h => h.toLowerCase().includes("lat")),
-  lon: headers.findIndex(h => h.toLowerCase().includes("lon")),
-  pressure: headers.findIndex(h =>
-    h.toLowerCase().includes("pressure") ||
-    h.toLowerCase().includes("mslp")
-  ),
-  wind: headers.findIndex(h =>
-    h.toLowerCase().includes("maximum") &&
-    h.toLowerCase().includes("wind")
-    ),
-  r34: headers.map((h,i)=>h.toLowerCase().includes("34") ? i : -1).filter(i=>i>=0),
-r50: headers.map((h,i)=>h.toLowerCase().includes("50") ? i : -1).filter(i=>i>=0),
-r64: headers.map((h,i)=>h.toLowerCase().includes("64") ? i : -1).filter(i=>i>=0)  
-};          
-console.log(headers);
+          IDX = {
 
-    if(headers[0] !== "basin") continue;
+            sample:
+              headers.indexOf("sample"),
 
-    continue;
-}
+            validTime:
+              headers.indexOf("valid_time"),
 
-        if(cols.length < 22) continue;
+            lat:
+              headers.findIndex(
+                h =>
+                  h
+                    .toLowerCase()
+                    .includes("lat")
+              ),
 
-        const sample = cols[IDX.sample];
-const validTime = cols[IDX.validTime];
-        const latIdx = IDX.lat;
-const lonIdx = IDX.lon;
-const pressureIdx = IDX.pressure;
-const windIdx = IDX.wind;
-        const lat = parseFloat(cols[latIdx]);
-        const lon = parseFloat(cols[lonIdx]);
-        const pressure = parseFloat(cols[pressureIdx]);
-        const wind = parseFloat(cols[windIdx]);
+            lon:
+              headers.findIndex(
+                h =>
+                  h
+                    .toLowerCase()
+                    .includes("lon")
+              ),
 
-       const r34 = maxNum(IDX.r34.map(i => cols[i]));
-const r50 = maxNum(IDX.r50.map(i => cols[i]));
-const r64 = maxNum(IDX.r64.map(i => cols[i]));
+            pressure:
+              headers.findIndex(
+                h => {
 
-        if(isNaN(lat) || isNaN(lon)) continue;
-        rows++;
+                  const x =
+                    h.toLowerCase();
 
-        if(!firstPoint) firstPoint = {lat,lon,time:validTime};
-        lastPoint = {lat,lon,time:validTime};
-        latestTime = later(latestTime, validTime);
+                  return (
+                    x.includes("pressure") ||
+                    x.includes("mslp")
+                  );
+                }
+              ),
 
-        const d = distKm(HK_LAT, HK_LON, lat, lon);
+            wind:
+              headers.findIndex(
+                h => {
 
-        if(!trackMap.has(sample)){
-          trackMap.set(sample,{
-            sample,
-            closest:Infinity,
-            time:"-",
-            maxWind:-Infinity,
-            minPressure:Infinity,
-            maxR34:0,
-            maxR50:0,
-            maxR64:0,
-            t1:false,t3:false,t8:false,t9:false,t10:false,
-            impactStart:"-",
-            impactEnd:"-",
-            first:null,
-            last:null
-          });
+                  const x =
+                    h.toLowerCase();
+
+                  return (
+                    x.includes("maximum") &&
+                    x.includes("wind")
+                  );
+                }
+              ),
+
+            r34:
+              headers
+                .map(
+                  (h,i) =>
+                    h
+                      .toLowerCase()
+                      .includes("34")
+                      ? i
+                      : -1
+                )
+                .filter(i => i >= 0),
+
+            r50:
+              headers
+                .map(
+                  (h,i) =>
+                    h
+                      .toLowerCase()
+                      .includes("50")
+                      ? i
+                      : -1
+                )
+                .filter(i => i >= 0),
+
+            r64:
+              headers
+                .map(
+                  (h,i) =>
+                    h
+                      .toLowerCase()
+                      .includes("64")
+                      ? i
+                      : -1
+                )
+                .filter(i => i >= 0)
+          };
+
+          if(
+            headers[0].toLowerCase() !==
+            "basin"
+          ){
+            throw new Error(
+              "Invalid Google CSV header"
+            );
+          }
+
+          if(
+            IDX.sample < 0 ||
+            IDX.validTime < 0 ||
+            IDX.lat < 0 ||
+            IDX.lon < 0 ||
+            IDX.pressure < 0 ||
+            IDX.wind < 0
+          ){
+            throw new Error(
+              "Required CSV columns missing"
+            );
+          }
+
+          continue;
         }
 
-        const t = trackMap.get(sample);
+        if(cols.length < headers.length){
+          continue;
+        }
 
-        if(!t.first) t.first = {lat,lon,time:validTime};
-        t.last = {lat,lon,time:validTime};
+        const sample =
+          cols[IDX.sample];
+
+        const validTime =
+          cols[IDX.validTime];
+
+        const lat =
+          parseFloat(
+            cols[IDX.lat]
+          );
+
+        const lon =
+          parseFloat(
+            cols[IDX.lon]
+          );
+
+        const pressure =
+          parseFloat(
+            cols[IDX.pressure]
+          );
+
+        const wind =
+          parseFloat(
+            cols[IDX.wind]
+          );
+
+        const r34 =
+          maxNum(
+            IDX.r34.map(
+              i => cols[i]
+            )
+          );
+
+        const r50 =
+          maxNum(
+            IDX.r50.map(
+              i => cols[i]
+            )
+          );
+
+        const r64 =
+          maxNum(
+            IDX.r64.map(
+              i => cols[i]
+            )
+          );
+
+        if(
+          isNaN(lat) ||
+          isNaN(lon)
+        ){
+          continue;
+        }
+
+        rows++;
+
+        if(!firstPoint){
+
+          firstPoint = {
+            lat,
+            lon,
+            time:validTime
+          };
+        }
+
+        lastPoint = {
+          lat,
+          lon,
+          time:validTime
+        };
+
+        latestTime =
+          later(
+            latestTime,
+            validTime
+          );
+
+        const d =
+          distKm(
+            HK_LAT,
+            HK_LON,
+            lat,
+            lon
+          );
+
+        if(!trackMap.has(sample)){
+
+          trackMap.set(
+            sample,
+            {
+              sample,
+              closest:Infinity,
+              time:"-",
+              maxWind:-Infinity,
+              minPressure:Infinity,
+              maxR34:0,
+              maxR50:0,
+              maxR64:0,
+              t1:false,
+              t3:false,
+              t8:false,
+              t9:false,
+              t10:false,
+              impactStart:"-",
+              impactEnd:"-",
+              first:null,
+              last:null
+            }
+          );
+        }
+
+        const t =
+          trackMap.get(sample);
+
+        if(!t.first){
+
+          t.first = {
+            lat,
+            lon,
+            time:validTime
+          };
+        }
+
+        t.last = {
+          lat,
+          lon,
+          time:validTime
+        };
 
         if(d < t.closest){
+
           t.closest = d;
           t.time = validTime;
         }
 
-        if(!isNaN(wind) && wind > t.maxWind) t.maxWind = wind;
-        if(!isNaN(pressure) && pressure < t.minPressure) t.minPressure = pressure;
-        if(r34 > t.maxR34) t.maxR34 = r34;
-        if(r50 > t.maxR50) t.maxR50 = r50;
-        if(r64 > t.maxR64) t.maxR64 = r64;
+        if(
+          !isNaN(wind) &&
+          wind > t.maxWind
+        ){
+          t.maxWind = wind;
+        }
 
-        const hitT1 = d <= 800 && wind >= 34;
-        const hitT3 = d <= 500 && wind >= 41;
-        const hitT8 = r34 > 0 && d <= r34;
-        const hitT9 = r50 > 0 && d <= r50;
-        const hitT10 = r64 > 0 && d <= r64;
+        if(
+          !isNaN(pressure) &&
+          pressure < t.minPressure
+        ){
+          t.minPressure =
+            pressure;
+        }
 
-        if(hitT1) t.t1 = true;
-        if(hitT3) t.t3 = true;
-        if(hitT8) t.t8 = true;
-        if(hitT9) t.t9 = true;
-        if(hitT10) t.t10 = true;
+        if(r34 > t.maxR34){
+          t.maxR34 = r34;
+        }
 
-        if(hitT1 || hitT3 || hitT8 || hitT9 || hitT10){
-          t.impactStart = earlier(t.impactStart, validTime);
-          t.impactEnd = later(t.impactEnd, validTime);
+        if(r50 > t.maxR50){
+          t.maxR50 = r50;
+        }
+
+        if(r64 > t.maxR64){
+          t.maxR64 = r64;
+        }
+
+        const hitT1 =
+          d <= 800 &&
+          wind >= 34;
+
+        const hitT3 =
+          d <= 500 &&
+          wind >= 41;
+
+        const hitT8 =
+          r34 > 0 &&
+          d <= r34;
+
+        const hitT9 =
+          r50 > 0 &&
+          d <= r50;
+
+        const hitT10 =
+          r64 > 0 &&
+          d <= r64;
+
+        if(hitT1){
+          t.t1 = true;
+        }
+
+        if(hitT3){
+          t.t3 = true;
+        }
+
+        if(hitT8){
+          t.t8 = true;
+        }
+
+        if(hitT9){
+          t.t9 = true;
+        }
+
+        if(hitT10){
+          t.t10 = true;
+        }
+
+        if(
+          hitT1 ||
+          hitT3 ||
+          hitT8 ||
+          hitT9 ||
+          hitT10
+        ){
+
+          t.impactStart =
+            earlier(
+              t.impactStart,
+              validTime
+            );
+
+          t.impactEnd =
+            later(
+              t.impactEnd,
+              validTime
+            );
         }
 
         if(d < globalClosest){
+
           globalClosest = d;
-          globalClosestTime = validTime;
+          globalClosestTime =
+            validTime;
         }
 
-        if(!isNaN(wind) && wind > maxWind) maxWind = wind;
-        if(!isNaN(pressure) && pressure < minPressure) minPressure = pressure;
+        if(
+          !isNaN(wind) &&
+          wind > maxWind
+        ){
+          maxWind = wind;
+        }
+
+        if(
+          !isNaN(pressure) &&
+          pressure < minPressure
+        ){
+          minPressure = pressure;
+        }
       }
 
-      const tracks = Array.from(trackMap.values());
-      const total = tracks.length;
+      const tracks =
+        Array.from(
+          trackMap.values()
+        );
 
-      let c1=0,c3=0,c8=0,c9=0,c10=0;
-      let d200=0,d400=0,d800=0,d999=0;
-      let winStart="-", winEnd="-";
+      const total =
+        tracks.length;
+
+      let c1 = 0;
+      let c3 = 0;
+      let c8 = 0;
+      let c9 = 0;
+      let c10 = 0;
+
+      let d200 = 0;
+      let d400 = 0;
+      let d800 = 0;
+      let d999 = 0;
+
+      let winStart = "-";
+      let winEnd = "-";
 
       for(const t of tracks){
-        if(t.t1) c1++;
-        if(t.t3) c3++;
-        if(t.t8) c8++;
-        if(t.t9) c9++;
-        if(t.t10) c10++;
 
-        if(t.closest <= 200) d200++;
-        else if(t.closest <= 400) d400++;
-        else if(t.closest <= 800) d800++;
-        else d999++;
+        if(t.t1){
+          c1++;
+        }
 
-        if(t.impactStart !== "-") winStart = earlier(winStart, t.impactStart);
-        if(t.impactEnd !== "-") winEnd = later(winEnd, t.impactEnd);
+        if(t.t3){
+          c3++;
+        }
+
+        if(t.t8){
+          c8++;
+        }
+
+        if(t.t9){
+          c9++;
+        }
+
+        if(t.t10){
+          c10++;
+        }
+
+        if(t.closest <= 200){
+
+          d200++;
+
+        }else if(t.closest <= 400){
+
+          d400++;
+
+        }else if(t.closest <= 800){
+
+          d800++;
+
+        }else{
+
+          d999++;
+        }
+
+        if(t.impactStart !== "-"){
+
+          winStart =
+            earlier(
+              winStart,
+              t.impactStart
+            );
+        }
+
+        if(t.impactEnd !== "-"){
+
+          winEnd =
+            later(
+              winEnd,
+              t.impactEnd
+            );
+        }
       }
 
-      const distances = tracks.map(t => t.closest).filter(x => isFinite(x)).sort((a,b)=>a-b);
-      const p50 = percentile(distances,50);
-      const p10 = percentile(distances,10);
-      const p01 = percentile(distances,1);
+      const distances =
+        tracks
+          .map(t => t.closest)
+          .filter(x => isFinite(x))
+          .sort((a,b) => a-b);
 
-      const p1 = total ? c1/total : 0;
-      const p3 = total ? c3/total : 0;
-      const p8 = total ? c8/total : 0;
-      const p9 = total ? c9/total : 0;
-      const p10risk = total ? c10/total : 0;
+      const p50 =
+        percentile(
+          distances,
+          50
+        );
 
-      let overall = "LOW";
-      let cls = "low";
+      const p10 =
+        percentile(
+          distances,
+          10
+        );
 
-      if(p10risk >= 0.03){ overall = "T10 RISK"; cls = "extreme"; }
-      else if(p9 >= 0.05){ overall = "T9 RISK"; cls = "danger"; }
-      else if(p8 >= 0.10){ overall = "T8 POSSIBLE"; cls = "high"; }
-      else if(p3 >= 0.20){ overall = "T3 POSSIBLE"; cls = "mid"; }
-      else if(p1 >= 0.25){ overall = "T1 POSSIBLE"; cls = "mid"; }
+      const p01 =
+        percentile(
+          distances,
+          1
+        );
 
-      const impactWindow = winStart === "-" ? "-" : `${winStart} → ${winEnd}`;
-      const worstTracks = tracks.sort((a,b)=>a.closest-b.closest).slice(0,10);
-      const bestTrack = worstTracks[0] || null;
+      const p1 =
+        total
+          ? c1/total
+          : 0;
 
-      const displayLat = bestTrack?.last?.lat ?? lastPoint?.lat;
-      const displayLon = bestTrack?.last?.lon ?? lastPoint?.lon;
-      const moveDir = bestTrack && bestTrack.first && bestTrack.last
-        ? directionText(bestTrack.first.lat,bestTrack.first.lon,bestTrack.last.lat,bestTrack.last.lon)
-        : "-";
+      const p3 =
+        total
+          ? c3/total
+          : 0;
 
-      document.getElementById("stormName").innerText = bestTrack ? `Member ${bestTrack.sample}` : "-";
-      document.getElementById("stormType").innerText = stormTypeFromWindKt(maxWind);
-      document.getElementById("stormPos").innerText =
-        isFinite(displayLat) && isFinite(displayLon) ? `${displayLat.toFixed(1)}°N ${displayLon.toFixed(1)}°E` : "-";
-      document.getElementById("stormMove").innerText = moveDir;
-      document.getElementById("stormWind").innerText = isFinite(maxWind) ? `${(maxWind*1.852).toFixed(0)} km/h` : "-";
-      document.getElementById("stormPressure").innerText = isFinite(minPressure) ? `${minPressure.toFixed(1)} hPa` : "-";
+      const p8 =
+        total
+          ? c8/total
+          : 0;
 
-      const worstText = worstTracks.map((t,i)=>
+      const p9 =
+        total
+          ? c9/total
+          : 0;
+
+      const p10risk =
+        total
+          ? c10/total
+          : 0;
+
+      let overall =
+        "LOW";
+
+      let cls =
+        "low";
+
+      if(p10risk >= 0.03){
+
+        overall =
+          "T10 RISK";
+
+        cls =
+          "extreme";
+
+      }else if(p9 >= 0.05){
+
+        overall =
+          "T9 RISK";
+
+        cls =
+          "danger";
+
+      }else if(p8 >= 0.10){
+
+        overall =
+          "T8 POSSIBLE";
+
+        cls =
+          "high";
+
+      }else if(p3 >= 0.20){
+
+        overall =
+          "T3 POSSIBLE";
+
+        cls =
+          "mid";
+
+      }else if(p1 >= 0.25){
+
+        overall =
+          "T1 POSSIBLE";
+
+        cls =
+          "mid";
+      }
+
+      const impactWindow =
+        winStart === "-"
+          ? "-"
+          : `${winStart} → ${winEnd}`;
+
+      const worstTracks =
+        [...tracks]
+          .sort(
+            (a,b) =>
+              a.closest-b.closest
+          )
+          .slice(0,10);
+
+      const bestTrack =
+        worstTracks[0] ||
+        null;
+
+      const displayLat =
+        bestTrack?.last?.lat ??
+        lastPoint?.lat;
+
+      const displayLon =
+        bestTrack?.last?.lon ??
+        lastPoint?.lon;
+
+      const moveDir =
+        bestTrack &&
+        bestTrack.first &&
+        bestTrack.last
+          ? directionText(
+              bestTrack.first.lat,
+              bestTrack.first.lon,
+              bestTrack.last.lat,
+              bestTrack.last.lon
+            )
+          : "-";
+
+      document
+        .getElementById("stormName")
+        .innerText =
+          bestTrack
+            ? `Member ${bestTrack.sample}`
+            : "-";
+
+      document
+        .getElementById("stormType")
+        .innerText =
+          stormTypeFromWindKt(
+            maxWind
+          );
+
+      document
+        .getElementById("stormPos")
+        .innerText =
+          isFinite(displayLat) &&
+          isFinite(displayLon)
+            ? `${displayLat.toFixed(1)}°N ${displayLon.toFixed(1)}°E`
+            : "-";
+
+      document
+        .getElementById("stormMove")
+        .innerText =
+          moveDir;
+
+      document
+        .getElementById("stormWind")
+        .innerText =
+          isFinite(maxWind)
+            ? `${(maxWind*1.852).toFixed(0)} km/h`
+            : "-";
+
+      document
+        .getElementById("stormPressure")
+        .innerText =
+          isFinite(minPressure)
+            ? `${minPressure.toFixed(1)} hPa`
+            : "-";
+
+      const worstText =
+        worstTracks
+          .map(
+            (t,i) =>
 `#${i+1}
 Member: ${t.sample}
 Closest: ${t.closest.toFixed(0)} km
 Time: ${t.time}
-Max Wind: ${isFinite(t.maxWind)?t.maxWind.toFixed(1)+" kt":"-"}
-Lowest Pressure: ${isFinite(t.minPressure)?t.minPressure.toFixed(1)+" hPa":"-"}
+Max Wind: ${isFinite(t.maxWind) ? t.maxWind.toFixed(1)+" kt" : "-"}
+Lowest Pressure: ${isFinite(t.minPressure) ? t.minPressure.toFixed(1)+" hPa" : "-"}
 Max 34kt Radius: ${t.maxR34.toFixed(0)} km
 Max 50kt Radius: ${t.maxR50.toFixed(0)} km
 Max 64kt Radius: ${t.maxR64.toFixed(0)} km`
-      ).join("\n\n");
+          )
+          .join("\n\n");
 
       const explanation =
 `Risk explanation:
@@ -530,50 +1496,177 @@ Max 64kt Radius: ${t.maxR64.toFixed(0)} km`
 • ${c8} / ${total} members show 34kt wind radius reaching Hong Kong.
 • ${c9} / ${total} members show 50kt wind radius reaching Hong Kong.
 • ${c10} / ${total} members show 64kt wind radius reaching Hong Kong.
-• Closest ensemble member reaches ${isFinite(globalClosest)?globalClosest.toFixed(0)+" km":"-"} from Hong Kong.
+• Closest ensemble member reaches ${isFinite(globalClosest) ? globalClosest.toFixed(0)+" km" : "-"} from Hong Kong.
 • P50 distance: ${p50 === "-" ? "-" : p50.toFixed(0)+" km"}
 • P10 distance: ${p10 === "-" ? "-" : p10.toFixed(0)+" km"}
 • P01 distance: ${p01 === "-" ? "-" : p01.toFixed(0)+" km"}
 
 Interpretation:
-${overall === "LOW" ? "Most ensemble members stay far from Hong Kong in this run." : "Some ensemble members show possible Hong Kong impact. Monitor next update."}`;
+${overall === "LOW"
+  ? "Most ensemble members stay far from Hong Kong in this run."
+  : "Some ensemble members show possible Hong Kong impact. Monitor next update."
+}`;
 
-      document.getElementById("status").innerText = "Analysis Complete";
-      document.getElementById("overall").innerText = overall;
-      document.getElementById("overall").className = cls;
+      document
+        .getElementById("status")
+        .innerText =
+          "Analysis Complete";
 
-      document.getElementById("t1").innerText = pct(c1,total);
-      document.getElementById("t3").innerText = pct(c3,total);
-      document.getElementById("t8").innerText = pct(c8,total);
-      document.getElementById("t9").innerText = pct(c9,total);
-      document.getElementById("t10").innerText = pct(c10,total);
+      document
+        .getElementById("overall")
+        .innerText =
+          overall;
 
-      document.getElementById("window").innerText = impactWindow;
-      document.getElementById("closest").innerText = isFinite(globalClosest) ? globalClosest.toFixed(0) + " km" : "-";
-      document.getElementById("ctime").innerText = globalClosestTime;
-      document.getElementById("wind").innerText = isFinite(maxWind) ? maxWind.toFixed(1) + " kt" : "-";
-      document.getElementById("pressure").innerText = isFinite(minPressure) ? minPressure.toFixed(1) + " hPa" : "-";
+      document
+        .getElementById("overall")
+        .className =
+          cls;
 
-      document.getElementById("p50").innerText = p50 === "-" ? "-" : p50.toFixed(0) + " km";
-      document.getElementById("p10").innerText = p10 === "-" ? "-" : p10.toFixed(0) + " km";
-      document.getElementById("p01").innerText = p01 === "-" ? "-" : p01.toFixed(0) + " km";
+      document
+        .getElementById("t1")
+        .innerText =
+          pct(c1,total);
 
-      document.getElementById("d200").innerText = `${d200} (${pct(d200,total)})`;
-      document.getElementById("d400").innerText = `${d400} (${pct(d400,total)})`;
-      document.getElementById("d800").innerText = `${d800} (${pct(d800,total)})`;
-      document.getElementById("d999").innerText = `${d999} (${pct(d999,total)})`;
+      document
+        .getElementById("t3")
+        .innerText =
+          pct(c3,total);
 
-      setBar("bar200",d200,total);
-      setBar("bar400",d400,total);
-      setBar("bar800",d800,total);
-      setBar("bar999",d999,total);
+      document
+        .getElementById("t8")
+        .innerText =
+          pct(c8,total);
 
-      document.getElementById("tracks").innerText = total;
-      document.getElementById("rows").innerText = rows;
-      document.getElementById("explain").innerText = explanation;
-      document.getElementById("worst").innerText = worstText || "No tracks found.";
+      document
+        .getElementById("t9")
+        .innerText =
+          pct(c9,total);
 
-      document.getElementById("summary").value =
+      document
+        .getElementById("t10")
+        .innerText =
+          pct(c10,total);
+
+      document
+        .getElementById("window")
+        .innerText =
+          impactWindow;
+
+      document
+        .getElementById("closest")
+        .innerText =
+          isFinite(globalClosest)
+            ? globalClosest.toFixed(0) + " km"
+            : "-";
+
+      document
+        .getElementById("ctime")
+        .innerText =
+          globalClosestTime;
+
+      document
+        .getElementById("wind")
+        .innerText =
+          isFinite(maxWind)
+            ? maxWind.toFixed(1) + " kt"
+            : "-";
+
+      document
+        .getElementById("pressure")
+        .innerText =
+          isFinite(minPressure)
+            ? minPressure.toFixed(1) + " hPa"
+            : "-";
+
+      document
+        .getElementById("p50")
+        .innerText =
+          p50 === "-"
+            ? "-"
+            : p50.toFixed(0) + " km";
+
+      document
+        .getElementById("p10")
+        .innerText =
+          p10 === "-"
+            ? "-"
+            : p10.toFixed(0) + " km";
+
+      document
+        .getElementById("p01")
+        .innerText =
+          p01 === "-"
+            ? "-"
+            : p01.toFixed(0) + " km";
+
+      document
+        .getElementById("d200")
+        .innerText =
+          `${d200} (${pct(d200,total)})`;
+
+      document
+        .getElementById("d400")
+        .innerText =
+          `${d400} (${pct(d400,total)})`;
+
+      document
+        .getElementById("d800")
+        .innerText =
+          `${d800} (${pct(d800,total)})`;
+
+      document
+        .getElementById("d999")
+        .innerText =
+          `${d999} (${pct(d999,total)})`;
+
+      setBar(
+        "bar200",
+        d200,
+        total
+      );
+
+      setBar(
+        "bar400",
+        d400,
+        total
+      );
+
+      setBar(
+        "bar800",
+        d800,
+        total
+      );
+
+      setBar(
+        "bar999",
+        d999,
+        total
+      );
+
+      document
+        .getElementById("tracks")
+        .innerText =
+          total;
+
+      document
+        .getElementById("rows")
+        .innerText =
+          rows;
+
+      document
+        .getElementById("explain")
+        .innerText =
+          explanation;
+
+      document
+        .getElementById("worst")
+        .innerText =
+          worstText ||
+          "No tracks found.";
+
+      document
+        .getElementById("summary")
+        .value =
 `🌪 HK Typhoon AI Forecast V10
 
 Source: Google WeatherNext FNV3 Ensemble
@@ -581,16 +1674,21 @@ Members: ${total}
 Rows: ${rows}
 
 Storm Type: ${stormTypeFromWindKt(maxWind)}
-Position: ${isFinite(displayLat) && isFinite(displayLon) ? `${displayLat.toFixed(1)}N ${displayLon.toFixed(1)}E` : "-"}
+Position: ${
+  isFinite(displayLat) &&
+  isFinite(displayLon)
+    ? `${displayLat.toFixed(1)}N ${displayLon.toFixed(1)}E`
+    : "-"
+}
 Movement: ${moveDir}
 
 Overall Risk: ${overall}
 
-T1 Risk: ${pct(c1,total)}
-T3 Risk: ${pct(c3,total)}
-T8 Risk: ${pct(c8,total)}
-T9 Risk: ${pct(c9,total)}
-T10 Risk: ${pct(c10,total)}
+Model T1 Support: ${pct(c1,total)}
+Model T3 Support: ${pct(c3,total)}
+Model T8 Support: ${pct(c8,total)}
+Model T9 Support: ${pct(c9,total)}
+Model T10 Support: ${pct(c10,total)}
 
 Impact Window:
 ${impactWindow}
@@ -620,181 +1718,454 @@ Distance Distribution:
 
 Note: AI estimate only. Not official HKO warning.`;
 
-      document.getElementById("telegramStatus").innerText = "Telegram: Ready to send";
+      document
+        .getElementById("telegramStatus")
+        .innerText =
+          "Telegram: Ready to send";
 
     }catch(err){
-      document.getElementById("status").innerText = "Error";
-      alert("Error: " + err.message);
+
+      document
+        .getElementById("status")
+        .innerText =
+          "Error";
+
+      alert(
+        "Error: " +
+        err.message
+      );
     }
   };
 
-  reader.readAsText(file);
+  if(file){
+
+    reader.readAsText(file);
+
+  }else{
+
+    reader.onload({
+      target:{
+        result:
+          window.autoCsvText
+      }
+    });
+  }
 }
+
 async function loadHKOStatus(){
-  const signalEl = document.getElementById("hkoSignal");
-  const updateEl = document.getElementById("hkoUpdate");
 
-  signalEl.innerText = "Loading...";
-  updateEl.innerText = "--";
-  try {
-  const res = await fetch(
-    "https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=warnsum&lang=en"
-  );
+  const signalEl =
+    document
+      .getElementById("hkoSignal");
 
-  if (!res.ok) {
-    throw new Error("HKO API failed: " + res.status);
+  const updateEl =
+    document
+      .getElementById("hkoUpdate");
+
+  signalEl.innerText =
+    "Loading...";
+
+  updateEl.innerText =
+    "--";
+
+  try{
+
+    const res =
+      await fetch(
+        "https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=warnsum&lang=en"
+      );
+
+    if(!res.ok){
+
+      throw new Error(
+        "HKO API failed: " +
+        res.status
+      );
+    }
+
+    const data =
+      await res.json();
+
+    const tc =
+      data.WTCSGNL;
+
+    if(
+      !tc ||
+      tc.actionCode === "CANCEL"
+    ){
+
+      signalEl.innerText =
+        "No Tropical Cyclone Signal";
+
+      updateEl.innerText =
+        "--";
+
+      return;
+    }
+
+    const signalMap = {
+
+      TC1:
+        "🟡 Standby Signal No.1",
+
+      TC3:
+        "🟠 Strong Wind Signal No.3",
+
+      TC8NE:
+        "🔴 No.8 Northeast Gale or Storm Signal",
+
+      TC8SE:
+        "🔴 No.8 Southeast Gale or Storm Signal",
+
+      TC8SW:
+        "🔴 No.8 Southwest Gale or Storm Signal",
+
+      TC8NW:
+        "🔴 No.8 Northwest Gale or Storm Signal",
+
+      TC9:
+        "🟣 Increasing Gale or Storm Signal No.9",
+
+      TC10:
+        "⚫ Hurricane Signal No.10"
+    };
+
+    signalEl.innerText =
+      signalMap[tc.code] ||
+      tc.type ||
+      tc.code ||
+      "Signal information unavailable";
+
+    const updateTime =
+      tc.updateTime ||
+      tc.issueTime;
+
+    updateEl.innerText =
+      updateTime
+        ? new Date(
+            updateTime
+          ).toLocaleString(
+            "en-HK",
+            {
+              timeZone:
+                "Asia/Hong_Kong",
+
+              hour12:
+                false
+            }
+          )
+        : "--";
+
+  }catch(err){
+
+    signalEl.innerText =
+      "HKO data unavailable";
+
+    updateEl.innerText =
+      "--";
+
+    console.error(
+      "HKO API Error:",
+      err
+    );
   }
-
-  const data = await res.json();
-  const tc = data.WTCSGNL;
-
-  if (!tc || tc.actionCode === "CANCEL") {
-    signalEl.innerText = "No Tropical Cyclone Signal";
-    updateEl.innerText = "--";
-    return;
-  }
-
-  const signalMap = {
-    TC1: "🟡 Standby Signal No.1",
-    TC3: "🟠 Strong Wind Signal No.3",
-    TC8NE: "🔴 No.8 Northeast Gale or Storm Signal",
-    TC8SE: "🔴 No.8 Southeast Gale or Storm Signal",
-    TC8SW: "🔴 No.8 Southwest Gale or Storm Signal",
-    TC8NW: "🔴 No.8 Northwest Gale or Storm Signal",
-    TC9: "🟣 Increasing Gale or Storm Signal No.9",
-    TC10: "⚫ Hurricane Signal No.10"
-  };
-
-  signalEl.innerText = signalMap[tc.code] || tc.type || tc.code;
-
-  const updateTime = tc.updateTime || tc.issueTime;
-
-  updateEl.innerText = updateTime
-    ? new Date(updateTime).toLocaleString("en-HK", {
-        timeZone: "Asia/Hong_Kong",
-        hour12: false
-      })
-    : "--";
-
-} catch (err) {
-  signalEl.innerText = "HKO data unavailable";
-  updateEl.innerText = "--";
-  console.error("HKO API Error:", err);
-} 
 }
 
-window.addEventListener("DOMContentLoaded", loadHKOStatus);
+window.addEventListener(
+  "DOMContentLoaded",
+  loadHKOStatus
+);
 
 async function loadLatestGoogleCSV(){
-  async function loadLatestGoogleCSV(){
-  document.getElementById("status").innerText = "Auto downloading Google CSV...";
 
-  function pad(n){ return String(n).padStart(2,"0"); }
+  document
+    .getElementById("status")
+    .innerText =
+      "Auto downloading Google CSV...";
 
-  function makeUrl(date, hour){
-    const yyyy = date.getUTCFullYear();
-    const mm = pad(date.getUTCMonth() + 1);
-    const dd = pad(date.getUTCDate());
-    const hh = pad(hour);
+  function pad(n){
+
+    return String(n)
+      .padStart(2,"0");
+  }
+
+  function makeUrl(date,hour){
+
+    const yyyy =
+      date.getUTCFullYear();
+
+    const mm =
+      pad(
+        date.getUTCMonth()+1
+      );
+
+    const dd =
+      pad(
+        date.getUTCDate()
+      );
+
+    const hh =
+      pad(hour);
 
     return `https://deepmind.google.com/science/weatherlab/download/cyclones/FNV3_LARGE_ENSEMBLE/ensemble/paired/csv/FNV3_LARGE_ENSEMBLE_${yyyy}_${mm}_${dd}T${hh}_00_paired.csv`;
   }
 
-  const hours = [18,12,6,0];
-  const candidates = [];
+  const hours =
+    [18,12,6,0];
 
-  for(let dayBack = 0; dayBack <= 4; dayBack++){
-    const d = new Date();
-    d.setUTCDate(d.getUTCDate() - dayBack);
+  const candidates =
+    [];
+
+  for(
+    let dayBack=0;
+    dayBack<=4;
+    dayBack++
+  ){
+
+    const d =
+      new Date();
+
+    d.setUTCDate(
+      d.getUTCDate() -
+      dayBack
+    );
+
     for(const h of hours){
-      candidates.push(makeUrl(d,h));
+
+      candidates.push(
+        makeUrl(
+          d,
+          h
+        )
+      );
     }
   }
 
-  const tried = [];
+  const tried =
+    [];
 
   try{
-    for(const url of candidates){
-      document.getElementById("status").innerText =
-        "Trying Google CSV: " + url.split("/").pop();
 
-      const res = await fetch(TELEGRAM_WORKER_URL, {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({ csv_url:url })
-      });
+    for(const url of candidates){
+
+      document
+        .getElementById("status")
+        .innerText =
+          "Trying Google CSV: " +
+          url.split("/").pop();
+
+      const res =
+        await fetch(
+          TELEGRAM_WORKER_URL,
+          {
+            method:"POST",
+
+            headers:{
+              "Content-Type":
+                "application/json"
+            },
+
+            body:
+              JSON.stringify({
+                csv_url:url
+              })
+          }
+        );
 
       if(!res.ok){
-        const err = await res.text();
-        tried.push(url + " => " + err);
+
+        const err =
+          await res.text();
+
+        tried.push(
+          url +
+          " => " +
+          err
+        );
+
         continue;
       }
 
-      const text = await res.text();
-      window.autoCsvText = text;
-      if(!text.includes("# BEGIN DATA")){
-        tried.push(url + " => invalid csv");
+      const text =
+        await res.text();
+
+      if(
+        !text.includes(
+          "# BEGIN DATA"
+        )
+      ){
+
+        tried.push(
+          url +
+          " => invalid csv"
+        );
+
         continue;
       }
 
-      const blob = new Blob([text], {type:"text/csv"});
-      const file = new File([blob], "google_auto.csv");
+      window.autoCsvText =
+        text;
 
-      const dt = new DataTransfer();
+      const blob =
+        new Blob(
+          [text],
+          {
+            type:"text/csv"
+          }
+        );
+
+      const file =
+        new File(
+          [blob],
+          "google_auto.csv",
+          {
+            type:"text/csv"
+          }
+        );
+
+      const dt =
+        new DataTransfer();
+
       dt.items.add(file);
-      document.getElementById("csvFile").files = dt.files;
 
-      document.getElementById("status").innerText =
-        "Google CSV Loaded: " + url.split("/").pop();
+      document
+        .getElementById("csvFile")
+        .files =
+          dt.files;
+
+      document
+        .getElementById("status")
+        .innerText =
+          "Google CSV Loaded: " +
+          url.split("/").pop();
 
       readCSV();
+
       return;
     }
 
-    alert("All Google CSV candidates failed:\n\n" + tried.join("\n\n"));
-    document.getElementById("status").innerText = "Auto CSV Failed";
+    alert(
+      "All Google CSV candidates failed:\n\n" +
+      tried.join("\n\n")
+    );
+
+    document
+      .getElementById("status")
+      .innerText =
+        "Auto CSV Failed";
 
   }catch(err){
-    alert("Auto CSV Error: " + err.message);
-    document.getElementById("status").innerText = "Auto CSV Error";
+
+    alert(
+      "Auto CSV Error: " +
+      err.message
+    );
+
+    document
+      .getElementById("status")
+      .innerText =
+        "Auto CSV Error";
   }
 }
 
 function copySummary(){
-  const txt = document.getElementById("summary");
+
+  const txt =
+    document
+      .getElementById("summary");
+
   txt.select();
-  document.execCommand("copy");
-  alert("Copied");
+
+  navigator
+    .clipboard
+    .writeText(
+      txt.value
+    )
+    .then(
+      () => alert("Copied")
+    )
+    .catch(
+      () => {
+
+        document
+          .execCommand("copy");
+
+        alert("Copied");
+      }
+    );
 }
 
 async function sendTelegram(){
-  const message = document.getElementById("summary").value;
+
+  const message =
+    document
+      .getElementById("summary")
+      .value;
+
   if(!message.trim()){
-    alert("No summary yet. Run analysis first.");
+
+    alert(
+      "No summary yet. Run analysis first."
+    );
+
     return;
   }
 
-  document.getElementById("telegramStatus").innerText = "Telegram: Sending...";
+  document
+    .getElementById("telegramStatus")
+    .innerText =
+      "Telegram: Sending...";
 
   try{
-    const res = await fetch(TELEGRAM_WORKER_URL, {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ text:message })
-    });
+
+    const res =
+      await fetch(
+        TELEGRAM_WORKER_URL,
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+              text:message
+            })
+        }
+      );
 
     if(!res.ok){
-      const err = await res.text();
+
+      const err =
+        await res.text();
+
       throw new Error(err);
     }
 
-    document.getElementById("telegramStatus").innerText = "Telegram: Sent";
+    document
+      .getElementById("telegramStatus")
+      .innerText =
+        "Telegram: Sent";
+
     alert("Telegram sent");
+
   }catch(err){
-    document.getElementById("telegramStatus").innerText = "Telegram: Failed";
-    alert("Telegram Error: " + err.message);
+
+    document
+      .getElementById("telegramStatus")
+      .innerText =
+        "Telegram: Failed";
+
+    alert(
+      "Telegram Error: " +
+      err.message
+    );
   }
 }
+
 </script>
+
 </body>
 </html>
