@@ -295,6 +295,7 @@ if(!file && !window.autoCsvText){ alert("Select CSV first"); return; }
 
       let dataStarted = false;
       let headers = [];
+      var IDX = null;      
       let rows = 0;
       const trackMap = new Map();
 
@@ -324,7 +325,7 @@ if(!file && !window.autoCsvText){ alert("Select CSV first"); return; }
     if(line.startsWith("#")) continue;
 
     headers = cols;
-const IDX = {
+IDX = {
   sample: headers.indexOf("sample"),
   validTime: headers.indexOf("valid_time"),
   lat: headers.findIndex(h => h.toLowerCase().includes("lat")),
