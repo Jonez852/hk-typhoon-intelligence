@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>HK Typhoon Intelligence V12</title>
+<title>HK Typhoon Intelligence V13</title>
 
 <style>
 *{
@@ -265,7 +265,7 @@ summary{
 
 <body>
 
-<h1 data-i18n="appTitle">🌪 HK Typhoon Intelligence V12</h1>
+<h1 data-i18n="appTitle">🌪 HK Typhoon Intelligence V13</h1>
 
 <div class="version" data-i18n="subtitle">
   Official HKO status + Google AI ensemble screening · AI values are not HKO signal probabilities
@@ -365,6 +365,21 @@ summary{
     <p class="small" data-i18n="aiEstimateOnly">
       Google WeatherNext FNV3 Ensemble · AI estimate only.
     </p>
+
+    <div class="grid" style="margin-top:14px">
+      <div class="kpi">
+        <div class="label" data-i18n="googleModelBatch">Google AI Model Batch</div>
+        <div class="value" id="googleModelBatch">--</div>
+      </div>
+      <div class="kpi">
+        <div class="label" data-i18n="downloadTime">Download Time</div>
+        <div class="value" id="googleDownloadTime">--</div>
+      </div>
+      <div class="kpi" style="grid-column:1/-1">
+        <div class="label" data-i18n="loadedFilename">Loaded File</div>
+        <div class="value" id="googleLoadedFile" style="font-size:15px;word-break:break-all">--</div>
+      </div>
+    </div>
 
   </div>
 
@@ -607,13 +622,13 @@ summary{
 
 const I18N = {
   "zh-HK": {
-    appTitle:"🌪 香港颱風智能分析 V12", subtitle:"香港天文台官方狀態＋Google AI 集合模式篩選 · AI 數值並非天文台發出信號的機率", languageLabel:"語言", stormDashboard:"🌀 風暴儀表板", officialHKO:"🏛 香港天文台官方資料", currentSignal:"現時信號", lastUpdate:"最後更新", worstMember:"最壞情景模式成員", worstType:"最壞情景類型", closestPosition:"最接近香港時位置", trackDirection:"整體移動方向", memberPeakWind:"該成員最高風速", memberLowestPressure:"該成員最低氣壓", uploadAuto:"📂 上載／自動下載", uploadCSV:"上載 FNV3 集合模式 CSV", analyzeButton:"分析香港颱風風險", downloadButton:"自動下載最新 Google CSV", aiEstimateOnly:"Google WeatherNext FNV3 集合模式 · 只屬 AI 推算。", aiSupportTitle:"🚦 AI 情景支持度", supportDisclaimer:"以下百分比只代表符合內部篩選條件的模式成員比例，並非香港天文台發出相應信號的機率。", interpretationTitle:"🧭 AI 人話解讀", statusLabel:"狀態：", screeningLevel:"AI 篩選級別：", t1Support:"T1 類似情景支持度", t3Support:"T3 類似情景支持度", t8Support:"T8 類似風場支持度", t9Support:"T9 類似風場支持度", t10Support:"T10 類似風場支持度", ensembleStats:"📊 集合模式統計", scenarioWindow:"AI 情景時段（UTC）", minimumDistance:"最低情景距離", minimumTime:"最低距離時間（UTC）", strongestWind:"模式成員最強風速", lowestPressure:"模式成員最低氣壓", membersRows:"成員數／資料行數", distanceDistribution:"📏 距離分布", distancePercentiles:"📈 距離百分位", riskExplanation:"🧠 風險解釋", topWorst:"🔥 最壞 10 條路徑", shareSummary:"📲 WhatsApp／Telegram 摘要", copySummary:"複製摘要", sendTelegram:"發送 Telegram 警報", waiting:"等待中", loading:"載入中…", analysisComplete:"分析完成", reading:"讀取中…", noSignal:"現時沒有熱帶氣旋警告信號", unavailable:"天文台資料暫時無法取得", copied:"已複製", sent:"Telegram 已發送", telegramWaiting:"Telegram：等待中", telegramReady:"Telegram：可以發送", telegramSending:"Telegram：發送中…", telegramSent:"Telegram：已發送", telegramFailed:"Telegram：發送失敗"
+    appTitle:"🌪 香港颱風智能分析 V13", subtitle:"香港天文台官方狀態＋Google AI 集合模式篩選 · AI 數值並非天文台發出信號的機率", languageLabel:"語言", stormDashboard:"🌀 風暴儀表板", officialHKO:"🏛 香港天文台官方資料", currentSignal:"現時信號", lastUpdate:"最後更新", worstMember:"最接近香港的預測路徑", worstType:"該路徑預測的最高強度", closestPosition:"最接近香港時位置", trackDirection:"整體移動方向", memberPeakWind:"該路徑最高風速", memberLowestPressure:"該路徑最低氣壓", uploadAuto:"📂 上載／自動下載", uploadCSV:"上載 FNV3 集合模式 CSV", analyzeButton:"分析香港颱風風險", downloadButton:"自動下載最新 Google CSV", aiEstimateOnly:"Google WeatherNext FNV3 集合模式 · 只屬 AI 推算。", aiSupportTitle:"🚦 AI 情景支持度", supportDisclaimer:"以下百分比只代表符合內部篩選條件的模式成員比例，並非香港天文台發出相應信號的機率。", interpretationTitle:"🧭 AI 人話解讀", statusLabel:"狀態：", screeningLevel:"AI 篩選級別：", t1Support:"T1 類似情景支持度", t3Support:"T3 類似情景支持度", t8Support:"T8 類似風場支持度", t9Support:"T9 類似風場支持度", t10Support:"T10 類似風場支持度", ensembleStats:"📊 集合模式統計", scenarioWindow:"AI 情景時段（UTC）", minimumDistance:"最低情景距離", minimumTime:"最低距離時間（UTC）", strongestWind:"所有預測路徑最高風速", lowestPressure:"所有預測路徑最低氣壓", membersRows:"預測路徑數／資料行數", distanceDistribution:"📏 距離分布", distancePercentiles:"📈 距離百分位", riskExplanation:"🧠 風險解釋", topWorst:"🔥 最接近香港的 10 條預測路徑", shareSummary:"📲 WhatsApp／Telegram 摘要", copySummary:"複製摘要", sendTelegram:"發送 Telegram 警報", waiting:"等待中", loading:"載入中…", analysisComplete:"分析完成", reading:"讀取中…", noSignal:"現時沒有熱帶氣旋警告信號", unavailable:"天文台資料暫時無法取得", copied:"已複製", sent:"Telegram 已發送", telegramWaiting:"Telegram：等待中", telegramReady:"Telegram：可以發送", telegramSending:"Telegram：發送中…", telegramSent:"Telegram：已發送", telegramFailed:"Telegram：發送失敗", googleModelBatch:"Google AI 模型批次", downloadTime:"本次下載時間", loadedFilename:"已載入檔案"
   },
   en: {
-    appTitle:"🌪 HK Typhoon Intelligence V12", subtitle:"Official HKO status + Google AI ensemble screening · AI values are not HKO signal probabilities", languageLabel:"Language", stormDashboard:"🌀 Storm Dashboard", officialHKO:"🏛 Official HKO", currentSignal:"Current Signal", lastUpdate:"Last Update", worstMember:"Worst-case Model Member", worstType:"Worst-case Member Type", closestPosition:"Position at Closest Approach", trackDirection:"Overall Track Direction", memberPeakWind:"Member Peak Wind", memberLowestPressure:"Member Lowest Pressure", uploadAuto:"📂 Upload / Auto Download", uploadCSV:"Upload FNV3 Ensemble CSV", analyzeButton:"Analyze HK Typhoon Risk", downloadButton:"Auto Download Latest Google CSV", aiEstimateOnly:"Google WeatherNext FNV3 Ensemble · AI estimate only.", aiSupportTitle:"🚦 AI Scenario Support", supportDisclaimer:"These percentages show how many model members meet internal screening conditions. They are not the probability that HKO will issue a signal.", interpretationTitle:"🧭 AI Interpretation Summary", statusLabel:"Status:", screeningLevel:"AI Screening Level:", t1Support:"T1-like Scenario Support", t3Support:"T3-like Scenario Support", t8Support:"T8-like Wind-field Support", t9Support:"T9-like Wind-field Support", t10Support:"T10-like Wind-field Support", ensembleStats:"📊 Ensemble Statistics", scenarioWindow:"AI Scenario Window (UTC)", minimumDistance:"Minimum Scenario Distance", minimumTime:"Minimum-distance Time (UTC)", strongestWind:"Strongest Member Wind", lowestPressure:"Lowest Member Pressure", membersRows:"Members / Rows", distanceDistribution:"📏 Distance Distribution", distancePercentiles:"📈 Distance Percentiles", riskExplanation:"🧠 Risk Explanation", topWorst:"🔥 Top 10 Worst Tracks", shareSummary:"📲 WhatsApp / Telegram Summary", copySummary:"Copy Summary", sendTelegram:"Send Telegram Alert", waiting:"Waiting", loading:"Loading...", analysisComplete:"Analysis Complete", reading:"Reading...", noSignal:"No Tropical Cyclone Signal", unavailable:"HKO data unavailable", copied:"Copied", sent:"Telegram sent", telegramWaiting:"Telegram: Waiting", telegramReady:"Telegram: Ready to send", telegramSending:"Telegram: Sending...", telegramSent:"Telegram: Sent", telegramFailed:"Telegram: Failed"
+    appTitle:"🌪 HK Typhoon Intelligence V13", subtitle:"Official HKO status + Google AI ensemble screening · AI values are not HKO signal probabilities", languageLabel:"Language", stormDashboard:"🌀 Storm Dashboard", officialHKO:"🏛 Official HKO", currentSignal:"Current Signal", lastUpdate:"Last Update", worstMember:"Closest Forecast Track", worstType:"Peak Intensity on This Track", closestPosition:"Position at Closest Approach", trackDirection:"Overall Track Direction", memberPeakWind:"Track Peak Wind", memberLowestPressure:"Track Lowest Pressure", uploadAuto:"📂 Upload / Auto Download", uploadCSV:"Upload FNV3 Ensemble CSV", analyzeButton:"Analyze HK Typhoon Risk", downloadButton:"Auto Download Latest Google CSV", aiEstimateOnly:"Google WeatherNext FNV3 Ensemble · AI estimate only.", aiSupportTitle:"🚦 AI Scenario Support", supportDisclaimer:"These percentages show how many model members meet internal screening conditions. They are not the probability that HKO will issue a signal.", interpretationTitle:"🧭 AI Interpretation Summary", statusLabel:"Status:", screeningLevel:"AI Screening Level:", t1Support:"T1-like Scenario Support", t3Support:"T3-like Scenario Support", t8Support:"T8-like Wind-field Support", t9Support:"T9-like Wind-field Support", t10Support:"T10-like Wind-field Support", ensembleStats:"📊 Ensemble Statistics", scenarioWindow:"AI Scenario Window (UTC)", minimumDistance:"Minimum Scenario Distance", minimumTime:"Minimum-distance Time (UTC)", strongestWind:"Strongest Track Wind", lowestPressure:"Lowest Track Pressure", membersRows:"Forecast Tracks / Rows", distanceDistribution:"📏 Distance Distribution", distancePercentiles:"📈 Distance Percentiles", riskExplanation:"🧠 Risk Explanation", topWorst:"🔥 10 Closest Forecast Tracks", shareSummary:"📲 WhatsApp / Telegram Summary", copySummary:"Copy Summary", sendTelegram:"Send Telegram Alert", waiting:"Waiting", loading:"Loading...", analysisComplete:"Analysis Complete", reading:"Reading...", noSignal:"No Tropical Cyclone Signal", unavailable:"HKO data unavailable", copied:"Copied", sent:"Telegram sent", telegramWaiting:"Telegram: Waiting", telegramReady:"Telegram: Ready to send", telegramSending:"Telegram: Sending...", telegramSent:"Telegram: Sent", telegramFailed:"Telegram: Failed", googleModelBatch:"Google AI Model Batch", downloadTime:"Download Time", loadedFilename:"Loaded File"
   },
   ja: {
-    appTitle:"🌪 香港台風インテリジェンス V12", subtitle:"香港天文台の公式状況＋Google AIアンサンブル分析 · AI数値は警報発令確率ではありません", languageLabel:"言語", stormDashboard:"🌀 台風ダッシュボード", officialHKO:"🏛 香港天文台 公式情報", currentSignal:"現在のシグナル", lastUpdate:"最終更新", worstMember:"最悪ケースのモデルメンバー", worstType:"最悪ケースの種類", closestPosition:"最接近時の位置", trackDirection:"全体の進行方向", memberPeakWind:"メンバー最大風速", memberLowestPressure:"メンバー最低気圧", uploadAuto:"📂 アップロード／自動ダウンロード", uploadCSV:"FNV3 アンサンブルCSVをアップロード", analyzeButton:"香港への台風リスクを分析", downloadButton:"最新Google CSVを自動ダウンロード", aiEstimateOnly:"Google WeatherNext FNV3 アンサンブル · AI推定のみ。", aiSupportTitle:"🚦 AIシナリオ支持率", supportDisclaimer:"各割合は内部条件を満たすモデルメンバーの比率です。香港天文台が警報を発令する確率ではありません。", interpretationTitle:"🧭 AI解釈サマリー", statusLabel:"状態：", screeningLevel:"AIスクリーニングレベル：", t1Support:"T1相当シナリオ支持率", t3Support:"T3相当シナリオ支持率", t8Support:"T8相当風域支持率", t9Support:"T9相当風域支持率", t10Support:"T10相当風域支持率", ensembleStats:"📊 アンサンブル統計", scenarioWindow:"AIシナリオ期間（UTC）", minimumDistance:"最小シナリオ距離", minimumTime:"最小距離の時刻（UTC）", strongestWind:"モデルメンバー最大風速", lowestPressure:"モデルメンバー最低気圧", membersRows:"メンバー数／行数", distanceDistribution:"📏 距離分布", distancePercentiles:"📈 距離パーセンタイル", riskExplanation:"🧠 リスク説明", topWorst:"🔥 最悪10トラック", shareSummary:"📲 WhatsApp／Telegram 要約", copySummary:"要約をコピー", sendTelegram:"Telegram警報を送信", waiting:"待機中", loading:"読み込み中…", analysisComplete:"分析完了", reading:"読み込み中…", noSignal:"熱帯低気圧警報シグナルなし", unavailable:"香港天文台データを取得できません", copied:"コピーしました", sent:"Telegramを送信しました", telegramWaiting:"Telegram：待機中", telegramReady:"Telegram：送信可能", telegramSending:"Telegram：送信中…", telegramSent:"Telegram：送信済み", telegramFailed:"Telegram：送信失敗"
+    appTitle:"🌪 香港台風インテリジェンス V13", subtitle:"香港天文台の公式状況＋Google AIアンサンブル分析 · AI数値は警報発令確率ではありません", languageLabel:"言語", stormDashboard:"🌀 台風ダッシュボード", officialHKO:"🏛 香港天文台 公式情報", currentSignal:"現在のシグナル", lastUpdate:"最終更新", worstMember:"香港に最も接近する予測経路", worstType:"この経路の最大強度", closestPosition:"最接近時の位置", trackDirection:"全体の進行方向", memberPeakWind:"経路の最大風速", memberLowestPressure:"経路の最低気圧", uploadAuto:"📂 アップロード／自動ダウンロード", uploadCSV:"FNV3 アンサンブルCSVをアップロード", analyzeButton:"香港への台風リスクを分析", downloadButton:"最新Google CSVを自動ダウンロード", aiEstimateOnly:"Google WeatherNext FNV3 アンサンブル · AI推定のみ。", aiSupportTitle:"🚦 AIシナリオ支持率", supportDisclaimer:"各割合は内部条件を満たすモデルメンバーの比率です。香港天文台が警報を発令する確率ではありません。", interpretationTitle:"🧭 AI解釈サマリー", statusLabel:"状態：", screeningLevel:"AIスクリーニングレベル：", t1Support:"T1相当シナリオ支持率", t3Support:"T3相当シナリオ支持率", t8Support:"T8相当風域支持率", t9Support:"T9相当風域支持率", t10Support:"T10相当風域支持率", ensembleStats:"📊 アンサンブル統計", scenarioWindow:"AIシナリオ期間（UTC）", minimumDistance:"最小シナリオ距離", minimumTime:"最小距離の時刻（UTC）", strongestWind:"全予測経路の最大風速", lowestPressure:"全予測経路の最低気圧", membersRows:"予測経路数／行数", distanceDistribution:"📏 距離分布", distancePercentiles:"📈 距離パーセンタイル", riskExplanation:"🧠 リスク説明", topWorst:"🔥 香港に最も接近する10経路", shareSummary:"📲 WhatsApp／Telegram 要約", copySummary:"要約をコピー", sendTelegram:"Telegram警報を送信", waiting:"待機中", loading:"読み込み中…", analysisComplete:"分析完了", reading:"読み込み中…", noSignal:"熱帯低気圧警報シグナルなし", unavailable:"香港天文台データを取得できません", copied:"コピーしました", sent:"Telegramを送信しました", telegramWaiting:"Telegram：待機中", telegramReady:"Telegram：送信可能", telegramSending:"Telegram：送信中…", telegramSent:"Telegram：送信済み", telegramFailed:"Telegram：送信失敗", googleModelBatch:"Google AIモデル実行時刻", downloadTime:"ダウンロード時刻", loadedFilename:"読み込み済みファイル"
   }
 };
 let currentLang = localStorage.getItem("typhoonLanguage") || "zh-HK";
@@ -822,12 +837,38 @@ function directionText(lat1,lon1,lat2,lon2){
   return (ns+ew) || "-";
 }
 
+function formatHKT(date){
+  return new Intl.DateTimeFormat("en-CA",{
+    timeZone:"Asia/Hong_Kong",year:"numeric",month:"2-digit",day:"2-digit",
+    hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false
+  }).format(date).replace(",","") + " HKT";
+}
+
+function modelBatchFromFilename(name){
+  const m = String(name || "").match(/_(\d{4})_(\d{2})_(\d{2})T(\d{2})_(\d{2})/);
+  return m ? `${m[1]}-${m[2]}-${m[3]} ${m[4]}:${m[5]} UTC` : "--";
+}
+
+function updateGoogleFileMeta(filename, downloadedAt=new Date()){
+  document.getElementById("googleLoadedFile").innerText = filename || "--";
+  document.getElementById("googleModelBatch").innerText = modelBatchFromFilename(filename);
+  document.getElementById("googleDownloadTime").innerText = formatHKT(downloadedAt);
+}
+
+function forecastTrackLabel(sample){
+  if(currentLang === "zh-HK") return `集合預報路徑 #${sample}`;
+  if(currentLang === "ja") return `アンサンブル予測経路 #${sample}`;
+  return `Ensemble Track #${sample}`;
+}
+
 function readCSV(){
 
   const file =
     document
       .getElementById("csvFile")
       .files[0];
+
+  if(file && !window.autoCsvText){ updateGoogleFileMeta(file.name, new Date()); }
 
   if(!file && !window.autoCsvText){
 
@@ -1501,7 +1542,7 @@ function readCSV(){
         .getElementById("stormName")
         .innerText =
           bestTrack
-            ? `Member ${bestTrack.sample}`
+            ? forecastTrackLabel(bestTrack.sample)
             : "-";
 
       document
@@ -1543,7 +1584,7 @@ function readCSV(){
           .map(
             (t,i) =>
 `#${i+1}
-Member: ${t.sample}
+Track: ${forecastTrackLabel(t.sample)}
 Closest: ${t.closest.toFixed(0)} km
 Time: ${t.time}
 Max Wind: ${isFinite(t.maxWind) ? t.maxWind.toFixed(1)+" kt" : "-"}
@@ -1746,10 +1787,10 @@ ${overall === "LOW"
 `🌪 HK Typhoon AI Forecast V10
 
 Source: Google WeatherNext FNV3 Ensemble
-Members: ${total}
+Forecast Tracks: ${total}
 Rows: ${rows}
 
-Worst-case Member Type: ${bestTrack ? stormTypeFromWindKt(bestTrack.maxWind) : "-"}
+Closest-track Peak Intensity: ${bestTrack ? stormTypeFromWindKt(bestTrack.maxWind) : "-"}
 Position: ${
   isFinite(displayLat) &&
   isFinite(displayLon)
@@ -2084,12 +2125,14 @@ async function loadLatestGoogleCSV(){
         .files =
           dt.files;
 
+      const loadedFilename = url.split("/").pop();
+
       document
         .getElementById("status")
         .innerText =
-          "Google CSV Loaded: " +
-          url.split("/").pop();
+          "Google CSV Loaded: " + loadedFilename;
 
+      updateGoogleFileMeta(loadedFilename, new Date());
       readCSV();
 
       return;
