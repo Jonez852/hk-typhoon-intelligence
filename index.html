@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>HK Typhoon Intelligence V10</title>
+<title>HK Typhoon Intelligence V11</title>
 
 <style>
 *{
@@ -247,10 +247,10 @@ summary{
 
 <body>
 
-<h1>🌪 HK Typhoon Intelligence V10</h1>
+<h1>🌪 HK Typhoon Intelligence V11</h1>
 
 <div class="version">
-  AI estimate only · Not official HKO warning
+  Official HKO status + Google AI ensemble screening · AI values are not HKO signal probabilities
 </div>
 
 <div class="card hero">
@@ -285,27 +285,27 @@ summary{
     </div>
 
     <div class="kpi">
-      <div class="label">Type</div>
+      <div class="label">Worst-case Member Type</div>
       <div class="value" id="stormType">-</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Position</div>
+      <div class="label">Position at Closest Approach</div>
       <div class="value" id="stormPos">-</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Movement</div>
+      <div class="label">Overall Track Direction</div>
       <div class="value" id="stormMove">-</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Max Wind</div>
+      <div class="label">Member Peak Wind</div>
       <div class="value" id="stormWind">-</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Central Pressure</div>
+      <div class="label">Member Lowest Pressure</div>
       <div class="value" id="stormPressure">-</div>
     </div>
 
@@ -345,7 +345,9 @@ summary{
 
 <div class="card">
 
-  <h2>🚦 HKO-style Signal Risk</h2>
+  <h2>🚦 AI Scenario Support</h2>
+
+  <p class="small">These percentages show how many model members meet internal screening conditions. They are not the probability that HKO will issue a signal.</p>
 
   <div class="result">
     Status:
@@ -362,27 +364,27 @@ summary{
   <div class="grid">
 
     <div class="kpi">
-      <div class="label">Model T1 Support</div>
+      <div class="label">T1-like Scenario Support</div>
       <div class="value" id="t1">0%</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Model T3 Support</div>
+      <div class="label">T3-like Scenario Support</div>
       <div class="value" id="t3">0%</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Model T8 Support</div>
+      <div class="label">T8-like Wind-field Support</div>
       <div class="value" id="t8">0%</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Model T9 Support</div>
+      <div class="label">T9-like Wind-field Support</div>
       <div class="value" id="t9">0%</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Model T10 Support</div>
+      <div class="label">T10-like Wind-field Support</div>
       <div class="value" id="t10">0%</div>
     </div>
 
@@ -397,27 +399,27 @@ summary{
   <div class="grid">
 
     <div class="kpi">
-      <div class="label">Impact Window</div>
+      <div class="label">AI Scenario Window (UTC)</div>
       <div class="value" id="window">-</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Closest Distance</div>
+      <div class="label">Minimum Scenario Distance</div>
       <div class="value" id="closest">-</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Closest Time</div>
+      <div class="label">Minimum-distance Time (UTC)</div>
       <div class="value" id="ctime">-</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Max Wind</div>
+      <div class="label">Strongest Member Wind</div>
       <div class="value" id="wind">-</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Lowest Pressure</div>
+      <div class="label">Lowest Member Pressure</div>
       <div class="value" id="pressure">-</div>
     </div>
 
@@ -1073,7 +1075,8 @@ function readCSV(){
               impactStart:"-",
               impactEnd:"-",
               first:null,
-              last:null
+              last:null,
+              closestPoint:null
             }
           );
         }
@@ -1100,6 +1103,11 @@ function readCSV(){
 
           t.closest = d;
           t.time = validTime;
+          t.closestPoint = {
+            lat,
+            lon,
+            time:validTime
+          };
         }
 
         if(
@@ -1219,6 +1227,10 @@ function readCSV(){
 
       const total =
         tracks.length;
+
+      if(total === 0 || rows === 0){
+        throw new Error("CSV loaded but no valid cyclone rows were found");
+      }
 
       let c1 = 0;
       let c3 = 0;
@@ -1350,7 +1362,7 @@ function readCSV(){
       if(p10risk >= 0.03){
 
         overall =
-          "T10 RISK";
+          "T10-LIKE SCENARIO";
 
         cls =
           "extreme";
@@ -1358,7 +1370,7 @@ function readCSV(){
       }else if(p9 >= 0.05){
 
         overall =
-          "T9 RISK";
+          "T9-LIKE SCENARIO";
 
         cls =
           "danger";
@@ -1366,7 +1378,7 @@ function readCSV(){
       }else if(p8 >= 0.10){
 
         overall =
-          "T8 POSSIBLE";
+          "T8-LIKE SUPPORT";
 
         cls =
           "high";
@@ -1374,7 +1386,7 @@ function readCSV(){
       }else if(p3 >= 0.20){
 
         overall =
-          "T3 POSSIBLE";
+          "T3-LIKE SUPPORT";
 
         cls =
           "mid";
@@ -1382,7 +1394,7 @@ function readCSV(){
       }else if(p1 >= 0.25){
 
         overall =
-          "T1 POSSIBLE";
+          "T1-LIKE SUPPORT";
 
         cls =
           "mid";
@@ -1406,10 +1418,12 @@ function readCSV(){
         null;
 
       const displayLat =
+        bestTrack?.closestPoint?.lat ??
         bestTrack?.last?.lat ??
         lastPoint?.lat;
 
       const displayLon =
+        bestTrack?.closestPoint?.lon ??
         bestTrack?.last?.lon ??
         lastPoint?.lon;
 
@@ -1435,9 +1449,9 @@ function readCSV(){
       document
         .getElementById("stormType")
         .innerText =
-          stormTypeFromWindKt(
-            maxWind
-          );
+          bestTrack
+            ? stormTypeFromWindKt(bestTrack.maxWind)
+            : "-";
 
       document
         .getElementById("stormPos")
@@ -1455,15 +1469,15 @@ function readCSV(){
       document
         .getElementById("stormWind")
         .innerText =
-          isFinite(maxWind)
-            ? `${(maxWind*1.852).toFixed(0)} km/h`
+          bestTrack && isFinite(bestTrack.maxWind)
+            ? `${bestTrack.maxWind.toFixed(1)} kt / ${(bestTrack.maxWind*1.852).toFixed(0)} km/h`
             : "-";
 
       document
         .getElementById("stormPressure")
         .innerText =
-          isFinite(minPressure)
-            ? `${minPressure.toFixed(1)} hPa`
+          bestTrack && isFinite(bestTrack.minPressure)
+            ? `${bestTrack.minPressure.toFixed(1)} hPa`
             : "-";
 
       const worstText =
@@ -1483,12 +1497,12 @@ Max 64kt Radius: ${t.maxR64.toFixed(0)} km`
           .join("\n\n");
 
       const explanation =
-`Risk explanation:
-• ${c1} / ${total} members meet T1 condition.
-• ${c3} / ${total} members meet T3 condition.
-• ${c8} / ${total} members show 34kt wind radius reaching Hong Kong.
-• ${c9} / ${total} members show 50kt wind radius reaching Hong Kong.
-• ${c10} / ${total} members show 64kt wind radius reaching Hong Kong.
+`AI scenario-screening explanation (not HKO signal probability):
+• ${c1} / ${total} members meet the internal T1-like screening condition.
+• ${c3} / ${total} members meet the internal T3-like screening condition.
+• ${c8} / ${total} members have a modelled 34kt wind field reaching Hong Kong.
+• ${c9} / ${total} members have a modelled 50kt wind field reaching Hong Kong.
+• ${c10} / ${total} members have a modelled 64kt wind field reaching Hong Kong.
 • Closest ensemble member reaches ${isFinite(globalClosest) ? globalClosest.toFixed(0)+" km" : "-"} from Hong Kong.
 • P50 distance: ${p50 === "-" ? "-" : p50.toFixed(0)+" km"}
 • P10 distance: ${p10 === "-" ? "-" : p10.toFixed(0)+" km"}
@@ -1496,8 +1510,8 @@ Max 64kt Radius: ${t.maxR64.toFixed(0)} km`
 
 Interpretation:
 ${overall === "LOW"
-  ? "Most ensemble members stay far from Hong Kong in this run."
-  : "Some ensemble members show possible Hong Kong impact. Monitor next update."
+  ? "Most ensemble members stay far from Hong Kong in this model run."
+  : "Some model members meet internal Hong Kong-impact screening conditions. This does not mean HKO will issue the corresponding signal."
 }`;
 
       document
@@ -1666,7 +1680,7 @@ Source: Google WeatherNext FNV3 Ensemble
 Members: ${total}
 Rows: ${rows}
 
-Storm Type: ${stormTypeFromWindKt(maxWind)}
+Worst-case Member Type: ${bestTrack ? stormTypeFromWindKt(bestTrack.maxWind) : "-"}
 Position: ${
   isFinite(displayLat) &&
   isFinite(displayLon)
@@ -1675,21 +1689,21 @@ Position: ${
 }
 Movement: ${moveDir}
 
-Overall Risk: ${overall}
+AI Scenario Support: ${overall}
 
-Model T1 Support: ${pct(c1,total)}
-Model T3 Support: ${pct(c3,total)}
-Model T8 Support: ${pct(c8,total)}
-Model T9 Support: ${pct(c9,total)}
-Model T10 Support: ${pct(c10,total)}
+T1-like Scenario Support: ${pct(c1,total)}
+T3-like Scenario Support: ${pct(c3,total)}
+T8-like Wind-field Support: ${pct(c8,total)}
+T9-like Wind-field Support: ${pct(c9,total)}
+T10-like Wind-field Support: ${pct(c10,total)}
 
-Impact Window:
+AI Scenario Window (UTC):
 ${impactWindow}
 
-Closest Distance:
+Minimum Scenario Distance:
 ${isFinite(globalClosest) ? globalClosest.toFixed(0)+" km" : "-"}
 
-Closest Time:
+Minimum-distance Time (UTC):
 ${globalClosestTime}
 
 Distance Percentiles:
@@ -1709,7 +1723,7 @@ Distance Distribution:
 400-800km: ${d800} (${pct(d800,total)})
 800km+: ${d999} (${pct(d999,total)})
 
-Note: AI estimate only. Not official HKO warning.`;
+Note: Model-member percentages are screening support, not HKO signal probabilities. Official signal status is shown separately.`;
 
       document
         .getElementById("telegramStatus")
@@ -1835,18 +1849,19 @@ async function loadHKOStatus(){
 
     updateEl.innerText =
       updateTime
-        ? new Date(
-            updateTime
-          ).toLocaleString(
-            "en-HK",
+        ? new Intl.DateTimeFormat(
+            "en-CA",
             {
-              timeZone:
-                "Asia/Hong_Kong",
-
-              hour12:
-                false
+              timeZone:"Asia/Hong_Kong",
+              year:"numeric",
+              month:"2-digit",
+              day:"2-digit",
+              hour:"2-digit",
+              minute:"2-digit",
+              second:"2-digit",
+              hour12:false
             }
-          )
+          ).format(new Date(updateTime)) + " HKT"
         : "--";
 
   }catch(err){
