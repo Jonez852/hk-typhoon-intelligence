@@ -349,9 +349,9 @@ const windIdx = headers.findIndex(h => {
         const pressure = parseFloat(cols[pressureIdx]);
         const wind = parseFloat(cols[windIdx]);
 
-        const r34 = maxNum([cols[10],cols[11],cols[12],cols[13]]);
-        const r50 = maxNum([cols[14],cols[15],cols[16],cols[17]]);
-        const r64 = maxNum([cols[18],cols[19],cols[20],cols[21]]);
+        const r34 = maxNum(headers.map((h,i) => h.toLowerCase().includes("34") ? cols[i] : null));
+const r50 = maxNum(headers.map((h,i) => h.toLowerCase().includes("50") ? cols[i] : null));
+const r64 = maxNum(headers.map((h,i) => h.toLowerCase().includes("64") ? cols[i] : null));
 
         if(isNaN(lat) || isNaN(lon)) continue;
         rows++;
