@@ -945,14 +945,7 @@ function readCSV(){
                 .filter(i => i >= 0)
           };
 
-          if(
-            headers[0].toLowerCase() !==
-            "basin"
-          ){
-            throw new Error(
-              "Invalid Google CSV header"
-            );
-          }
+          
 
           if(
             IDX.sample < 0 ||
