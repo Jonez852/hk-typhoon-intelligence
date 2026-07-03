@@ -324,8 +324,9 @@ if(!file && !window.autoCsvText){ alert("Select CSV first"); return; }
     if(line.startsWith("#")) continue;
 
     headers = cols;
-
-    // 必須真係係Google CSV header
+          
+console.log(headers);
+alert(headers.join("\n"));    // 必須真係係Google CSV header
     if(headers[0] !== "basin") continue;
 
     continue;
