@@ -324,7 +324,23 @@ if(!file && !window.autoCsvText){ alert("Select CSV first"); return; }
     if(line.startsWith("#")) continue;
 
     headers = cols;
-          
+const IDX = {
+  sample: headers.indexOf("sample"),
+  validTime: headers.indexOf("valid_time"),
+  lat: headers.findIndex(h => h.toLowerCase().includes("lat")),
+  lon: headers.findIndex(h => h.toLowerCase().includes("lon")),
+  pressure: headers.findIndex(h =>
+    h.toLowerCase().includes("pressure") ||
+    h.toLowerCase().includes("mslp")
+  ),
+  wind: headers.findIndex(h =>
+    h.toLowerCase().includes("maximum") &&
+    h.toLowerCase().includes("wind")
+    ),
+  r34: headers.map((h,i)=>h.toLowerCase().includes("34") ? i : -1).filter(i=>i>=0),
+r50: headers.map((h,i)=>h.toLowerCase().includes("50") ? i : -1).filter(i=>i>=0),
+r64: headers.map((h,i)=>h.toLowerCase().includes("64") ? i : -1).filter(i=>i>=0)  
+};          
 console.log(headers);
 alert(headers.join("\n"));    // 必須真係係Google CSV header
     if(headers[0] !== "basin") continue;
@@ -334,23 +350,20 @@ alert(headers.join("\n"));    // 必須真係係Google CSV header
 
         if(cols.length < 22) continue;
 
-        const sample = cols[headers.indexOf("sample")];
-const validTime = cols[headers.indexOf("valid_time")];
-        const latIdx = headers.findIndex(h => h.toLowerCase().includes("lat"));
-const lonIdx = headers.findIndex(h => h.toLowerCase().includes("lon"));
-const pressureIdx = headers.findIndex(h => h.toLowerCase().includes("pressure") || h.toLowerCase().includes("mslp"));
-const windIdx = headers.findIndex(h => {
-  const x = h.toLowerCase();
-  return x.includes("maximum") && x.includes("wind");
-});
+        const sample = cols[IDX.sample];
+const validTime = cols[IDX.validTime];
+        const latIdx = IDX.lat;
+const lonIdx = IDX.lon;
+const pressureIdx = IDX.pressure;
+const windIdx = IDX.wind;
         const lat = parseFloat(cols[latIdx]);
         const lon = parseFloat(cols[lonIdx]);
         const pressure = parseFloat(cols[pressureIdx]);
         const wind = parseFloat(cols[windIdx]);
 
-        const r34 = maxNum(headers.map((h,i) => h.toLowerCase().includes("34") ? cols[i] : null));
-const r50 = maxNum(headers.map((h,i) => h.toLowerCase().includes("50") ? cols[i] : null));
-const r64 = maxNum(headers.map((h,i) => h.toLowerCase().includes("64") ? cols[i] : null));
+       const r34 = maxNum(IDX.r34.map(i => cols[i]));
+const r50 = maxNum(IDX.r50.map(i => cols[i]));
+const r64 = maxNum(IDX.r64.map(i => cols[i]));
 
         if(isNaN(lat) || isNaN(lon)) continue;
         rows++;
