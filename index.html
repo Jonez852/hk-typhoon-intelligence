@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>HK Typhoon Intelligence V11</title>
+<title>HK Typhoon Intelligence V12</title>
 
 <style>
 *{
@@ -220,6 +220,24 @@ summary{
   font-size:13px;
 }
 
+.languageBar{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  margin:10px auto 16px;
+  flex-wrap:wrap;
+}
+.languageBar label{color:#cbd5e1;font-size:14px;font-weight:700}
+.languageBar select{
+  background:#020617;
+  color:white;
+  border:1px solid #475569;
+  border-radius:10px;
+  padding:9px 12px;
+  font-size:15px;
+}
+
 #officialHKO{
   margin-top:12px;
   margin-bottom:16px;
@@ -247,29 +265,38 @@ summary{
 
 <body>
 
-<h1>🌪 HK Typhoon Intelligence V11</h1>
+<h1 data-i18n="appTitle">🌪 HK Typhoon Intelligence V12</h1>
 
-<div class="version">
+<div class="version" data-i18n="subtitle">
   Official HKO status + Google AI ensemble screening · AI values are not HKO signal probabilities
+</div>
+
+<div class="languageBar">
+  <label for="languageSelect" data-i18n="languageLabel">Language</label>
+  <select id="languageSelect" onchange="setLanguage(this.value)">
+    <option value="zh-HK">繁體中文</option>
+    <option value="en">English</option>
+    <option value="ja">日本語</option>
+  </select>
 </div>
 
 <div class="card hero">
 
-  <h2>🌀 Storm Dashboard</h2>
+  <h2 data-i18n="stormDashboard">🌀 Storm Dashboard</h2>
 
   <div class="card" id="officialHKO">
 
-    <h3>🏛 Official HKO</h3>
+    <h3 data-i18n="officialHKO">🏛 Official HKO</h3>
 
     <div class="grid">
 
       <div class="kpi">
-        <div class="label">Current Signal</div>
+        <div class="label" data-i18n="currentSignal">Current Signal</div>
         <div class="value" id="hkoSignal">Loading...</div>
       </div>
 
       <div class="kpi">
-        <div class="label">Last Update</div>
+        <div class="label" data-i18n="lastUpdate">Last Update</div>
         <div class="value" id="hkoUpdate">--</div>
       </div>
 
@@ -280,32 +307,32 @@ summary{
   <div class="grid">
 
     <div class="kpi">
-      <div class="label">Worst-case Model Member</div>
+      <div class="label" data-i18n="worstMember">Worst-case Model Member</div>
       <div class="value" id="stormName">-</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Worst-case Member Type</div>
+      <div class="label" data-i18n="worstType">Worst-case Member Type</div>
       <div class="value" id="stormType">-</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Position at Closest Approach</div>
+      <div class="label" data-i18n="closestPosition">Position at Closest Approach</div>
       <div class="value" id="stormPos">-</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Overall Track Direction</div>
+      <div class="label" data-i18n="trackDirection">Overall Track Direction</div>
       <div class="value" id="stormMove">-</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Member Peak Wind</div>
+      <div class="label" data-i18n="memberPeakWind">Member Peak Wind</div>
       <div class="value" id="stormWind">-</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Member Lowest Pressure</div>
+      <div class="label" data-i18n="memberLowestPressure">Member Lowest Pressure</div>
       <div class="value" id="stormPressure">-</div>
     </div>
 
@@ -315,11 +342,11 @@ summary{
 
 <details open>
 
-  <summary>📂 Upload / Auto Download</summary>
+  <summary data-i18n="uploadAuto">📂 Upload / Auto Download</summary>
 
   <div class="card">
 
-    <h2>Upload FNV3 Ensemble CSV</h2>
+    <h2 data-i18n="uploadCSV">Upload FNV3 Ensemble CSV</h2>
 
     <input
       type="file"
@@ -327,15 +354,15 @@ summary{
       accept=".csv"
     >
 
-    <button onclick="readCSV()">
+    <button onclick="readCSV()" data-i18n="analyzeButton">
       Analyze HK Typhoon Risk
     </button>
 
-    <button onclick="loadLatestGoogleCSV()">
+    <button onclick="loadLatestGoogleCSV()" data-i18n="downloadButton">
       Auto Download Latest Google CSV
     </button>
 
-    <p class="small">
+    <p class="small" data-i18n="aiEstimateOnly">
       Google WeatherNext FNV3 Ensemble · AI estimate only.
     </p>
 
@@ -345,17 +372,17 @@ summary{
 
 <div class="card">
 
-  <h2>🚦 AI Scenario Support</h2>
+  <h2 data-i18n="aiSupportTitle">🚦 AI Scenario Support</h2>
 
-  <p class="small">These percentages show how many model members meet internal screening conditions. They are not the probability that HKO will issue a signal.</p>
+  <p class="small" data-i18n="supportDisclaimer">These percentages show how many model members meet internal screening conditions. They are not the probability that HKO will issue a signal.</p>
 
   <div class="result">
-    Status:
-    <span id="status">Waiting</span>
+    <span data-i18n="statusLabel">Status:</span>
+    <span id="status" data-state="waiting">Waiting</span>
   </div>
 
   <div class="result">
-    Overall Risk:
+    <span data-i18n="screeningLevel">AI Screening Level:</span>
     <span id="overall">-</span>
   </div>
 
@@ -364,27 +391,27 @@ summary{
   <div class="grid">
 
     <div class="kpi">
-      <div class="label">T1-like Scenario Support</div>
+      <div class="label" data-i18n="t1Support">T1-like Scenario Support</div>
       <div class="value" id="t1">0%</div>
     </div>
 
     <div class="kpi">
-      <div class="label">T3-like Scenario Support</div>
+      <div class="label" data-i18n="t3Support">T3-like Scenario Support</div>
       <div class="value" id="t3">0%</div>
     </div>
 
     <div class="kpi">
-      <div class="label">T8-like Wind-field Support</div>
+      <div class="label" data-i18n="t8Support">T8-like Wind-field Support</div>
       <div class="value" id="t8">0%</div>
     </div>
 
     <div class="kpi">
-      <div class="label">T9-like Wind-field Support</div>
+      <div class="label" data-i18n="t9Support">T9-like Wind-field Support</div>
       <div class="value" id="t9">0%</div>
     </div>
 
     <div class="kpi">
-      <div class="label">T10-like Wind-field Support</div>
+      <div class="label" data-i18n="t10Support">T10-like Wind-field Support</div>
       <div class="value" id="t10">0%</div>
     </div>
 
@@ -392,39 +419,45 @@ summary{
 
 </div>
 
+<div class="card" id="interpretationCard">
+  <h2 data-i18n="interpretationTitle">🧭 AI Interpretation Summary</h2>
+  <div class="result" id="interpretationMain">—</div>
+  <div class="small" id="interpretationDetail">—</div>
+</div>
+
 <div class="card">
 
-  <h2>📊 Ensemble Statistics</h2>
+  <h2 data-i18n="ensembleStats">📊 Ensemble Statistics</h2>
 
   <div class="grid">
 
     <div class="kpi">
-      <div class="label">AI Scenario Window (UTC)</div>
+      <div class="label" data-i18n="scenarioWindow">AI Scenario Window (UTC)</div>
       <div class="value" id="window">-</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Minimum Scenario Distance</div>
+      <div class="label" data-i18n="minimumDistance">Minimum Scenario Distance</div>
       <div class="value" id="closest">-</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Minimum-distance Time (UTC)</div>
+      <div class="label" data-i18n="minimumTime">Minimum-distance Time (UTC)</div>
       <div class="value" id="ctime">-</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Strongest Member Wind</div>
+      <div class="label" data-i18n="strongestWind">Strongest Member Wind</div>
       <div class="value" id="wind">-</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Lowest Member Pressure</div>
+      <div class="label" data-i18n="lowestPressure">Lowest Member Pressure</div>
       <div class="value" id="pressure">-</div>
     </div>
 
     <div class="kpi">
-      <div class="label">Members / Rows</div>
+      <div class="label" data-i18n="membersRows">Members / Rows</div>
 
       <div class="value">
         <span id="tracks">0</span>
@@ -439,7 +472,7 @@ summary{
 
 <details open>
 
-  <summary>📏 Distance Distribution</summary>
+  <summary data-i18n="distanceDistribution">📏 Distance Distribution</summary>
 
   <div class="card">
 
@@ -501,7 +534,7 @@ summary{
 
 <details>
 
-  <summary>📈 Distance Percentiles</summary>
+  <summary data-i18n="distancePercentiles">📈 Distance Percentiles</summary>
 
   <div class="card">
 
@@ -526,7 +559,7 @@ summary{
 
 <details>
 
-  <summary>🧠 Risk Explanation</summary>
+  <summary data-i18n="riskExplanation">🧠 Risk Explanation</summary>
 
   <div class="card">
     <pre id="explain">Waiting for CSV...</pre>
@@ -536,7 +569,7 @@ summary{
 
 <details>
 
-  <summary>🔥 Top 10 Worst Tracks</summary>
+  <summary data-i18n="topWorst">🔥 Top 10 Worst Tracks</summary>
 
   <div class="card">
     <pre id="worst">Waiting for CSV...</pre>
@@ -546,24 +579,24 @@ summary{
 
 <div class="card">
 
-  <h2>📲 WhatsApp / Telegram Summary</h2>
+  <h2 data-i18n="shareSummary">📲 WhatsApp / Telegram Summary</h2>
 
   <textarea
     id="summary"
     readonly
   ></textarea>
 
-  <button onclick="copySummary()">
+  <button onclick="copySummary()" data-i18n="copySummary">
     Copy Summary
   </button>
 
-  <button onclick="sendTelegram()">
+  <button onclick="sendTelegram()" data-i18n="sendTelegram">
     Send Telegram Alert
   </button>
 
   <p
     class="small"
-    id="telegramStatus"
+    id="telegramStatus" data-state="telegramWaiting"
   >
     Telegram: Waiting
   </p>
@@ -571,6 +604,34 @@ summary{
 </div>
 
 <script>
+
+const I18N = {
+  "zh-HK": {
+    appTitle:"🌪 香港颱風智能分析 V12", subtitle:"香港天文台官方狀態＋Google AI 集合模式篩選 · AI 數值並非天文台發出信號的機率", languageLabel:"語言", stormDashboard:"🌀 風暴儀表板", officialHKO:"🏛 香港天文台官方資料", currentSignal:"現時信號", lastUpdate:"最後更新", worstMember:"最壞情景模式成員", worstType:"最壞情景類型", closestPosition:"最接近香港時位置", trackDirection:"整體移動方向", memberPeakWind:"該成員最高風速", memberLowestPressure:"該成員最低氣壓", uploadAuto:"📂 上載／自動下載", uploadCSV:"上載 FNV3 集合模式 CSV", analyzeButton:"分析香港颱風風險", downloadButton:"自動下載最新 Google CSV", aiEstimateOnly:"Google WeatherNext FNV3 集合模式 · 只屬 AI 推算。", aiSupportTitle:"🚦 AI 情景支持度", supportDisclaimer:"以下百分比只代表符合內部篩選條件的模式成員比例，並非香港天文台發出相應信號的機率。", interpretationTitle:"🧭 AI 人話解讀", statusLabel:"狀態：", screeningLevel:"AI 篩選級別：", t1Support:"T1 類似情景支持度", t3Support:"T3 類似情景支持度", t8Support:"T8 類似風場支持度", t9Support:"T9 類似風場支持度", t10Support:"T10 類似風場支持度", ensembleStats:"📊 集合模式統計", scenarioWindow:"AI 情景時段（UTC）", minimumDistance:"最低情景距離", minimumTime:"最低距離時間（UTC）", strongestWind:"模式成員最強風速", lowestPressure:"模式成員最低氣壓", membersRows:"成員數／資料行數", distanceDistribution:"📏 距離分布", distancePercentiles:"📈 距離百分位", riskExplanation:"🧠 風險解釋", topWorst:"🔥 最壞 10 條路徑", shareSummary:"📲 WhatsApp／Telegram 摘要", copySummary:"複製摘要", sendTelegram:"發送 Telegram 警報", waiting:"等待中", loading:"載入中…", analysisComplete:"分析完成", reading:"讀取中…", noSignal:"現時沒有熱帶氣旋警告信號", unavailable:"天文台資料暫時無法取得", copied:"已複製", sent:"Telegram 已發送", telegramWaiting:"Telegram：等待中", telegramReady:"Telegram：可以發送", telegramSending:"Telegram：發送中…", telegramSent:"Telegram：已發送", telegramFailed:"Telegram：發送失敗"
+  },
+  en: {
+    appTitle:"🌪 HK Typhoon Intelligence V12", subtitle:"Official HKO status + Google AI ensemble screening · AI values are not HKO signal probabilities", languageLabel:"Language", stormDashboard:"🌀 Storm Dashboard", officialHKO:"🏛 Official HKO", currentSignal:"Current Signal", lastUpdate:"Last Update", worstMember:"Worst-case Model Member", worstType:"Worst-case Member Type", closestPosition:"Position at Closest Approach", trackDirection:"Overall Track Direction", memberPeakWind:"Member Peak Wind", memberLowestPressure:"Member Lowest Pressure", uploadAuto:"📂 Upload / Auto Download", uploadCSV:"Upload FNV3 Ensemble CSV", analyzeButton:"Analyze HK Typhoon Risk", downloadButton:"Auto Download Latest Google CSV", aiEstimateOnly:"Google WeatherNext FNV3 Ensemble · AI estimate only.", aiSupportTitle:"🚦 AI Scenario Support", supportDisclaimer:"These percentages show how many model members meet internal screening conditions. They are not the probability that HKO will issue a signal.", interpretationTitle:"🧭 AI Interpretation Summary", statusLabel:"Status:", screeningLevel:"AI Screening Level:", t1Support:"T1-like Scenario Support", t3Support:"T3-like Scenario Support", t8Support:"T8-like Wind-field Support", t9Support:"T9-like Wind-field Support", t10Support:"T10-like Wind-field Support", ensembleStats:"📊 Ensemble Statistics", scenarioWindow:"AI Scenario Window (UTC)", minimumDistance:"Minimum Scenario Distance", minimumTime:"Minimum-distance Time (UTC)", strongestWind:"Strongest Member Wind", lowestPressure:"Lowest Member Pressure", membersRows:"Members / Rows", distanceDistribution:"📏 Distance Distribution", distancePercentiles:"📈 Distance Percentiles", riskExplanation:"🧠 Risk Explanation", topWorst:"🔥 Top 10 Worst Tracks", shareSummary:"📲 WhatsApp / Telegram Summary", copySummary:"Copy Summary", sendTelegram:"Send Telegram Alert", waiting:"Waiting", loading:"Loading...", analysisComplete:"Analysis Complete", reading:"Reading...", noSignal:"No Tropical Cyclone Signal", unavailable:"HKO data unavailable", copied:"Copied", sent:"Telegram sent", telegramWaiting:"Telegram: Waiting", telegramReady:"Telegram: Ready to send", telegramSending:"Telegram: Sending...", telegramSent:"Telegram: Sent", telegramFailed:"Telegram: Failed"
+  },
+  ja: {
+    appTitle:"🌪 香港台風インテリジェンス V12", subtitle:"香港天文台の公式状況＋Google AIアンサンブル分析 · AI数値は警報発令確率ではありません", languageLabel:"言語", stormDashboard:"🌀 台風ダッシュボード", officialHKO:"🏛 香港天文台 公式情報", currentSignal:"現在のシグナル", lastUpdate:"最終更新", worstMember:"最悪ケースのモデルメンバー", worstType:"最悪ケースの種類", closestPosition:"最接近時の位置", trackDirection:"全体の進行方向", memberPeakWind:"メンバー最大風速", memberLowestPressure:"メンバー最低気圧", uploadAuto:"📂 アップロード／自動ダウンロード", uploadCSV:"FNV3 アンサンブルCSVをアップロード", analyzeButton:"香港への台風リスクを分析", downloadButton:"最新Google CSVを自動ダウンロード", aiEstimateOnly:"Google WeatherNext FNV3 アンサンブル · AI推定のみ。", aiSupportTitle:"🚦 AIシナリオ支持率", supportDisclaimer:"各割合は内部条件を満たすモデルメンバーの比率です。香港天文台が警報を発令する確率ではありません。", interpretationTitle:"🧭 AI解釈サマリー", statusLabel:"状態：", screeningLevel:"AIスクリーニングレベル：", t1Support:"T1相当シナリオ支持率", t3Support:"T3相当シナリオ支持率", t8Support:"T8相当風域支持率", t9Support:"T9相当風域支持率", t10Support:"T10相当風域支持率", ensembleStats:"📊 アンサンブル統計", scenarioWindow:"AIシナリオ期間（UTC）", minimumDistance:"最小シナリオ距離", minimumTime:"最小距離の時刻（UTC）", strongestWind:"モデルメンバー最大風速", lowestPressure:"モデルメンバー最低気圧", membersRows:"メンバー数／行数", distanceDistribution:"📏 距離分布", distancePercentiles:"📈 距離パーセンタイル", riskExplanation:"🧠 リスク説明", topWorst:"🔥 最悪10トラック", shareSummary:"📲 WhatsApp／Telegram 要約", copySummary:"要約をコピー", sendTelegram:"Telegram警報を送信", waiting:"待機中", loading:"読み込み中…", analysisComplete:"分析完了", reading:"読み込み中…", noSignal:"熱帯低気圧警報シグナルなし", unavailable:"香港天文台データを取得できません", copied:"コピーしました", sent:"Telegramを送信しました", telegramWaiting:"Telegram：待機中", telegramReady:"Telegram：送信可能", telegramSending:"Telegram：送信中…", telegramSent:"Telegram：送信済み", telegramFailed:"Telegram：送信失敗"
+  }
+};
+let currentLang = localStorage.getItem("typhoonLanguage") || "zh-HK";
+function tr(key){ return (I18N[currentLang] && I18N[currentLang][key]) || I18N.en[key] || key; }
+function setLanguage(lang){
+  currentLang = I18N[lang] ? lang : "en";
+  localStorage.setItem("typhoonLanguage", currentLang);
+  document.documentElement.lang = currentLang;
+  document.querySelectorAll("[data-i18n]").forEach(el=>{ const key=el.dataset.i18n; if(tr(key)) el.textContent=tr(key); });
+  const select=document.getElementById("languageSelect"); if(select) select.value=currentLang;
+  const status=document.getElementById("status");
+  if(status && status.dataset.state && tr(status.dataset.state)) status.textContent=tr(status.dataset.state);
+  const tg=document.getElementById("telegramStatus");
+  if(tg && tg.dataset.state && tr(tg.dataset.state)) tg.textContent=tr(tg.dataset.state);
+  loadHKOStatus();
+}
+function setStatusState(state){ const el=document.getElementById("status"); if(el){el.dataset.state=state;el.textContent=tr(state);} }
+function setTelegramState(state){ const el=document.getElementById("telegramStatus"); if(el){el.dataset.state=state;el.textContent=tr(state);} }
 
 const HK_LAT = 22.3193;
 const HK_LON = 114.1694;
@@ -775,10 +836,7 @@ function readCSV(){
     return;
   }
 
-  document
-    .getElementById("status")
-    .innerText =
-      "Reading...";
+  setStatusState("reading");
 
   const reader =
     new FileReader();
@@ -1514,10 +1572,7 @@ ${overall === "LOW"
   : "Some model members meet internal Hong Kong-impact screening conditions. This does not mean HKO will issue the corresponding signal."
 }`;
 
-      document
-        .getElementById("status")
-        .innerText =
-          "Analysis Complete";
+      setStatusState("analysisComplete");
 
       document
         .getElementById("overall")
@@ -1650,6 +1705,20 @@ ${overall === "LOW"
         total
       );
 
+      const within400 = d200 + d400;
+      const mainText = currentLang === "zh-HK"
+        ? `大部分模式路徑最接近香港時仍在 ${d800 >= d999 ? "400–800 公里" : "800 公里以外"}。`
+        : currentLang === "ja"
+          ? `大半のモデル経路は香港から${d800 >= d999 ? "400～800 km" : "800 km以上"}離れています。`
+          : `Most model tracks remain ${d800 >= d999 ? "400–800 km" : "more than 800 km"} from Hong Kong.`;
+      const detailText = currentLang === "zh-HK"
+        ? `400 公里內近距離離群路徑：${within400}／${total}；200 公里內：${d200}／${total}。最接近單一路徑不代表最可能結果。`
+        : currentLang === "ja"
+          ? `400 km以内の近接外れ値：${within400}／${total}、200 km以内：${d200}／${total}。最接近の単一路線が最も可能性の高い結果とは限りません。`
+          : `Close-approach outliers within 400 km: ${within400}/${total}; within 200 km: ${d200}/${total}. The closest single track is not the most likely outcome.`;
+      document.getElementById("interpretationMain").innerText = mainText;
+      document.getElementById("interpretationDetail").innerText = detailText;
+
       document
         .getElementById("tracks")
         .innerText =
@@ -1725,10 +1794,7 @@ Distance Distribution:
 
 Note: Model-member percentages are screening support, not HKO signal probabilities. Official signal status is shown separately.`;
 
-      document
-        .getElementById("telegramStatus")
-        .innerText =
-          "Telegram: Ready to send";
+      setTelegramState("telegramReady");
 
     }catch(err){
 
@@ -1770,7 +1836,7 @@ async function loadHKOStatus(){
       .getElementById("hkoUpdate");
 
   signalEl.innerText =
-    "Loading...";
+    tr("loading");
 
   updateEl.innerText =
     "--";
@@ -1802,7 +1868,7 @@ async function loadHKOStatus(){
     ){
 
       signalEl.innerText =
-        "No Tropical Cyclone Signal";
+        tr("noSignal");
 
       updateEl.innerText =
         "--";
@@ -1810,32 +1876,12 @@ async function loadHKOStatus(){
       return;
     }
 
-    const signalMap = {
-
-      TC1:
-        "🟡 Standby Signal No.1",
-
-      TC3:
-        "🟠 Strong Wind Signal No.3",
-
-      TC8NE:
-        "🔴 No.8 Northeast Gale or Storm Signal",
-
-      TC8SE:
-        "🔴 No.8 Southeast Gale or Storm Signal",
-
-      TC8SW:
-        "🔴 No.8 Southwest Gale or Storm Signal",
-
-      TC8NW:
-        "🔴 No.8 Northwest Gale or Storm Signal",
-
-      TC9:
-        "🟣 Increasing Gale or Storm Signal No.9",
-
-      TC10:
-        "⚫ Hurricane Signal No.10"
+    const signalMaps = {
+      "zh-HK": {TC1:"🟡 一號戒備信號",TC3:"🟠 三號強風信號",TC8NE:"🔴 八號東北烈風或暴風信號",TC8SE:"🔴 八號東南烈風或暴風信號",TC8SW:"🔴 八號西南烈風或暴風信號",TC8NW:"🔴 八號西北烈風或暴風信號",TC9:"🟣 九號烈風或暴風風力增強信號",TC10:"⚫ 十號颶風信號"},
+      en: {TC1:"🟡 Standby Signal No.1",TC3:"🟠 Strong Wind Signal No.3",TC8NE:"🔴 No.8 Northeast Gale or Storm Signal",TC8SE:"🔴 No.8 Southeast Gale or Storm Signal",TC8SW:"🔴 No.8 Southwest Gale or Storm Signal",TC8NW:"🔴 No.8 Northwest Gale or Storm Signal",TC9:"🟣 Increasing Gale or Storm Signal No.9",TC10:"⚫ Hurricane Signal No.10"},
+      ja: {TC1:"🟡 シグナル1",TC3:"🟠 シグナル3",TC8NE:"🔴 シグナル8 北東",TC8SE:"🔴 シグナル8 南東",TC8SW:"🔴 シグナル8 南西",TC8NW:"🔴 シグナル8 北西",TC9:"🟣 シグナル9",TC10:"⚫ シグナル10"}
     };
+    const signalMap = signalMaps[currentLang] || signalMaps.en;
 
     signalEl.innerText =
       signalMap[tc.code] ||
@@ -1867,7 +1913,7 @@ async function loadHKOStatus(){
   }catch(err){
 
     signalEl.innerText =
-      "HKO data unavailable";
+      tr("unavailable");
 
     updateEl.innerText =
       "--";
@@ -1879,10 +1925,7 @@ async function loadHKOStatus(){
   }
 }
 
-window.addEventListener(
-  "DOMContentLoaded",
-  loadHKOStatus
-);
+window.addEventListener("DOMContentLoaded", ()=>setLanguage(currentLang));
 
 async function loadLatestGoogleCSV(){
 
@@ -2090,7 +2133,7 @@ function copySummary(){
       txt.value
     )
     .then(
-      () => alert("Copied")
+      () => alert(tr("copied"))
     )
     .catch(
       () => {
@@ -2098,7 +2141,7 @@ function copySummary(){
         document
           .execCommand("copy");
 
-        alert("Copied");
+        alert(tr("copied"));
       }
     );
 }
@@ -2119,10 +2162,7 @@ async function sendTelegram(){
     return;
   }
 
-  document
-    .getElementById("telegramStatus")
-    .innerText =
-      "Telegram: Sending...";
+  setTelegramState("telegramSending");
 
   try{
 
@@ -2152,19 +2192,13 @@ async function sendTelegram(){
       throw new Error(err);
     }
 
-    document
-      .getElementById("telegramStatus")
-      .innerText =
-        "Telegram: Sent";
+    setTelegramState("telegramSent");
 
-    alert("Telegram sent");
+    alert(tr("sent"));
 
   }catch(err){
 
-    document
-      .getElementById("telegramStatus")
-      .innerText =
-        "Telegram: Failed";
+    setTelegramState("telegramFailed");
 
     alert(
       "Telegram Error: " +
