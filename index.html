@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>HK Typhoon Intelligence V16.5</title>
+<title>HK Typhoon Intelligence V16.7</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 
 <style>
@@ -319,12 +319,21 @@ summary{
 .leaflet-tooltip.intelLabel{background:rgba(2,6,23,.9);color:#fff;border:1px solid rgba(148,163,184,.35);box-shadow:none;font-weight:800}
 @media(max-width:760px){#typhoonMap{height:520px}.mapToolbar{grid-template-columns:auto 1fr}.mapTime{grid-column:1/-1;text-align:left}.mapInfoPanel{left:8px;right:8px;bottom:8px;width:auto;padding:8px}.mapInfoGrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.mapInfoTitle{display:none}.mapInfoValue{font-size:11px}.mapInfoLabel{font-size:9px}}
 .stormMovingLabel{background:rgba(2,6,23,.92);color:#fff;border:1px solid rgba(34,197,94,.65);border-radius:8px;padding:4px 7px;font-size:12px;font-weight:900;box-shadow:0 4px 14px rgba(0,0,0,.35);white-space:nowrap}.stormMovingLabel:before{display:none}
+
+.viewSwitch{display:flex;justify-content:center;gap:10px;margin:14px auto 18px;position:sticky;top:8px;z-index:1200;width:min(520px,calc(100% - 24px));padding:8px;border-radius:14px;background:rgba(2,6,23,.88);border:1px solid rgba(148,163,184,.22);backdrop-filter:blur(14px);box-shadow:0 10px 30px rgba(0,0,0,.28)}
+.viewSwitch button{flex:1;width:auto;margin:0;padding:11px 14px;border-radius:10px;background:rgba(15,23,42,.92);border:1px solid rgba(148,163,184,.22);color:#cbd5e1;font-weight:900}
+.viewSwitch button.active{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border-color:#60a5fa;box-shadow:0 0 0 1px rgba(96,165,250,.25) inset}
+#mapView,#dataView{display:block}
+#dataView[hidden],#mapView[hidden]{display:none!important}
+.mapFirstHint{text-align:center;color:#94a3b8;font-size:12px;margin:-8px 0 12px}
+@media(max-width:760px){.viewSwitch{top:4px;margin-top:8px}.viewSwitch button{padding:10px 8px;font-size:14px}#mapAnimationCard{margin-top:4px}}
+
 </style>
 </head>
 
 <body>
 
-<h1 data-i18n="appTitle">🌪 HK Typhoon Intelligence V16.5</h1>
+<h1 data-i18n="appTitle">🌪 HK Typhoon Intelligence V16.7</h1>
 
 <div class="version" data-i18n="subtitle">
   Official HKO status + Google AI ensemble screening · AI values are not HKO signal probabilities
@@ -338,6 +347,55 @@ summary{
     <option value="ja">日本語</option>
   </select>
 </div>
+
+<div class="viewSwitch" role="tablist" aria-label="View selector">
+  <button type="button" id="mapViewBtn" class="active" onclick="showMapView()">🗺️ 地圖首頁</button>
+  <button type="button" id="dataViewBtn" onclick="showDataView()">📊 詳細數據</button>
+</div>
+<div class="mapFirstHint">預設先看路徑動畫；詳細統計按「詳細數據」查看。</div>
+<section id="mapView">
+<div class="card" id="mapAnimationCard">
+  <div class="mapTopBar">
+    <div><div class="mapHeadline">🗺️ 香港颱風路徑動畫 / Typhoon Track Animation</div><div class="mapSubline">先看最可能路徑；集合路徑及極端情景按需要開啟</div></div>
+    <div class="livePill">LIVE DATA</div>
+  </div>
+  <div class="mapControlsRow">
+    <button type="button" class="mapToggle" id="toggleEnsemble" onclick="toggleMapLayer('ensemble')">集合路徑</button>
+    <button type="button" class="mapToggle active" id="toggleCone" onclick="toggleMapLayer('cone')">不確定範圍</button>
+    <button type="button" class="mapToggle active" id="toggleRings" onclick="toggleMapLayer('rings')">距離圈</button>
+    <button type="button" class="mapToggle" id="toggleExtreme" onclick="toggleMapLayer('extreme')">極端路徑參考</button>
+  </div>
+  <div class="mapToolbar">
+    <button type="button" id="mapPlayBtn" onclick="toggleMapAnimation()" disabled>▶ 播放</button>
+    <input id="mapTimeSlider" type="range" min="0" max="0" value="0" step="1" oninput="setMapFrame(Number(this.value))">
+    <span id="mapTimeLabel" class="mapTime">等待資料</span>
+  </div>
+  <div class="mapLegend">
+    <span><i class="legendDot" style="background:#38bdf8"></i>集合路徑</span>
+    <span><i class="legendDot" style="background:#22c55e"></i>代表性主流路徑</span>
+    <span><i class="legendDot" style="background:#b45309"></i>極端參考（非主流，預設隱藏）</span>
+    <span><i class="legendDot" style="background:#facc15"></i>香港</span>
+  </div>
+  <div style="position:relative;margin-top:12px">
+    <div id="typhoonMap"></div>
+    <div class="mapInfoPanel">
+      <div class="mapInfoTitle">目前動畫時間點</div>
+      <div class="mapInfoGrid">
+        <div class="mapInfoCell"><div class="mapInfoLabel">代表路徑風速</div><div id="mapRepWind" class="mapInfoValue">—</div></div>
+        <div class="mapInfoCell"><div class="mapInfoLabel">代表路徑氣壓</div><div id="mapRepPressure" class="mapInfoValue">—</div></div>
+        <div class="mapInfoCell"><div class="mapInfoLabel">距離香港</div><div id="mapRepDistance" class="mapInfoValue">—</div></div>
+        <div class="mapInfoCell"><div class="mapInfoLabel">集合路徑數</div><div id="mapTrackCount" class="mapInfoValue">—</div></div>
+        <div class="mapInfoCell"><div class="mapInfoLabel">系統名稱</div><div id="mapStormName" class="mapInfoValue">低壓區（未命名）</div></div>
+        <div class="mapInfoCell"><div class="mapInfoLabel">系統級別</div><div id="mapStormType" class="mapInfoValue">—</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</section>
+<section id="dataView" hidden>
+
 
 <div class="card hero">
 
@@ -724,44 +782,6 @@ summary{
 
 </details>
 
-<div class="card" id="mapAnimationCard">
-  <div class="mapTopBar">
-    <div><div class="mapHeadline">🗺️ 香港颱風情報地圖 / Typhoon Intelligence Map</div><div class="mapSubline">Google FNV3 集合路徑 · 香港距離圈 · 主流及極端情景 · 動畫時間軸</div></div>
-    <div class="livePill">LIVE DATA</div>
-  </div>
-  <div class="mapControlsRow">
-    <button type="button" class="mapToggle" id="toggleEnsemble" onclick="toggleMapLayer('ensemble')">集合路徑</button>
-    <button type="button" class="mapToggle active" id="toggleCone" onclick="toggleMapLayer('cone')">不確定範圍</button>
-    <button type="button" class="mapToggle active" id="toggleRings" onclick="toggleMapLayer('rings')">距離圈</button>
-    <button type="button" class="mapToggle" id="toggleExtreme" onclick="toggleMapLayer('extreme')">極端路徑參考</button>
-  </div>
-  <div class="mapToolbar">
-    <button type="button" id="mapPlayBtn" onclick="toggleMapAnimation()" disabled>▶ 播放</button>
-    <input id="mapTimeSlider" type="range" min="0" max="0" value="0" step="1" oninput="setMapFrame(Number(this.value))">
-    <span id="mapTimeLabel" class="mapTime">等待資料</span>
-  </div>
-  <div class="mapLegend">
-    <span><i class="legendDot" style="background:#38bdf8"></i>集合路徑</span>
-    <span><i class="legendDot" style="background:#22c55e"></i>代表性主流路徑</span>
-    <span><i class="legendDot" style="background:#b45309"></i>極端參考（非主流，預設隱藏）</span>
-    <span><i class="legendDot" style="background:#facc15"></i>香港</span>
-  </div>
-  <div style="position:relative;margin-top:12px">
-    <div id="typhoonMap"></div>
-    <div class="mapInfoPanel">
-      <div class="mapInfoTitle">目前動畫時間點</div>
-      <div class="mapInfoGrid">
-        <div class="mapInfoCell"><div class="mapInfoLabel">代表路徑風速</div><div id="mapRepWind" class="mapInfoValue">—</div></div>
-        <div class="mapInfoCell"><div class="mapInfoLabel">代表路徑氣壓</div><div id="mapRepPressure" class="mapInfoValue">—</div></div>
-        <div class="mapInfoCell"><div class="mapInfoLabel">距離香港</div><div id="mapRepDistance" class="mapInfoValue">—</div></div>
-        <div class="mapInfoCell"><div class="mapInfoLabel">集合路徑數</div><div id="mapTrackCount" class="mapInfoValue">—</div></div>
-        <div class="mapInfoCell"><div class="mapInfoLabel">系統名稱</div><div id="mapStormName" class="mapInfoValue">低壓區（未命名）</div></div>
-        <div class="mapInfoCell"><div class="mapInfoLabel">系統級別</div><div id="mapStormType" class="mapInfoValue">—</div></div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="card">
 
   <h2 data-i18n="shareSummary">📲 WhatsApp / Telegram Summary</h2>
@@ -788,17 +808,40 @@ summary{
 
 </div>
 
+
+</section>
 <script>
+
+function showMapView(){
+  const mapView=document.getElementById("mapView");
+  const dataView=document.getElementById("dataView");
+  if(mapView)mapView.hidden=false;
+  if(dataView)dataView.hidden=true;
+  document.getElementById("mapViewBtn")?.classList.add("active");
+  document.getElementById("dataViewBtn")?.classList.remove("active");
+  setTimeout(()=>{if(window.typhoonMap&&typeof window.typhoonMap.invalidateSize==="function")window.typhoonMap.invalidateSize()},120);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function showDataView(){
+  const mapView=document.getElementById("mapView");
+  const dataView=document.getElementById("dataView");
+  if(mapView)mapView.hidden=true;
+  if(dataView)dataView.hidden=false;
+  document.getElementById("dataViewBtn")?.classList.add("active");
+  document.getElementById("mapViewBtn")?.classList.remove("active");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
 
 const I18N = {
   "zh-HK": {
-    appTitle:"🌪 香港颱風智能分析 V16.5", subtitle:"香港天文台官方狀態＋Google AI 集合模式篩選 · AI 數值並非天文台發出信號的機率", languageLabel:"語言", stormDashboard:"🌀 風暴儀表板", officialHKO:"🏛 香港天文台官方資料", currentSignal:"現時信號", lastUpdate:"最後更新", worstMember:"最接近香港的預測路徑", worstType:"該路徑預測的最高強度", closestPosition:"最接近香港時位置", trackDirection:"整體移動方向", memberPeakWind:"該路徑最高風速", memberLowestPressure:"該路徑最低氣壓", uploadAuto:"📂 上載／自動下載", uploadCSV:"上載 FNV3 集合模式 CSV", analyzeButton:"分析香港颱風風險", downloadButton:"自動下載最新 Google CSV", aiEstimateOnly:"Google WeatherNext FNV3 集合模式 · 只屬 AI 推算。", aiSupportTitle:"🚦 香港影響篩選結果", supportDisclaimer:"以下百分比只代表符合內部篩選條件的模式成員比例，並非香港天文台發出相應信號的機率。", interpretationTitle:"🧭 AI 人話解讀", statusLabel:"狀態：", screeningLevel:"香港廣域影響篩選：", t1Support:"較寬鬆香港影響條件命中率", t3Support:"T3 類似情景支持度", t8Support:"T8 類似風場支持度", t9Support:"T9 類似風場支持度", t10Support:"T10 類似風場支持度", ensembleStats:"📊 集合模式統計", scenarioWindow:"AI 情景時段（UTC）", minimumDistance:"最低情景距離", minimumTime:"最低距離時間（UTC）", strongestWind:"所有預測路徑最高風速", lowestPressure:"所有預測路徑最低氣壓", membersRows:"預測路徑數／資料行數", distanceDistribution:"📏 距離分布", distancePercentiles:"📈 距離百分位", riskExplanation:"🧠 風險解釋", topWorst:"🔥 最接近香港的 10 條預測路徑（按距離排序）", shareSummary:"📲 WhatsApp／Telegram 摘要", copySummary:"複製摘要", sendTelegram:"發送 Telegram 警報", waiting:"等待中", loading:"載入中…", analysisComplete:"分析完成", reading:"讀取中…", noSignal:"現時沒有熱帶氣旋警告信號", unavailable:"天文台資料暫時無法取得", copied:"已複製", sent:"Telegram 已發送", telegramWaiting:"Telegram：等待中", telegramReady:"Telegram：可以發送", telegramSending:"Telegram：發送中…", telegramSent:"Telegram：已發送", telegramFailed:"Telegram：發送失敗", googleModelBatch:"Google AI 模型批次", downloadTime:"本次下載時間", loadedFilename:"已載入檔案", plainSummaryTitle:"🧭 主流預測摘要", mainstreamTrack:"代表性主流預測路徑", mainstreamType:"最接近香港時的中位數強度", mainstreamDistance:"最可能最近距離（P50）", reasonableRange:"合理距離範圍（P10–P90）", medianWind:"最接近香港時風速中位數", medianPressure:"最接近香港時氣壓中位數", extremeReference:"⚠️ 極端情景參考", extremeTrack:"最接近的離群路徑", extremeDistance:"極端最近距離", extremeWind:"極端路徑最近香港時風速", extremePressure:"極端路徑最近香港時氣壓", extremeDisclaimer:"此為離群極端情景，並非最可能預測。", trendTitle:"📉 模型輪次趨勢", dataFreshness:"資料新鮮度", previousRun:"上一個模型批次", lifecycleReference:"🧪 生命週期峰值參考", lifecycleMedianWind:"生命週期最高風速中位數", lifecycleMedianPressure:"生命週期最低氣壓中位數", extremeLifecycleWind:"極端路徑生命週期最高風速", extremeLifecyclePressure:"極端路徑生命週期最低氣壓", lifecycleDisclaimer:"以上峰值可能出現在遠離香港位置，只供技術參考。", p50Label:"P50 中位距離", p10Label:"P10 較接近情景", p01Label:"P01 少數極端情景", topWorstDisclaimer:"只按最接近香港的距離排序，不代表發生機率或最可能路徑。", officialOutlookTitle:"📢 天文台官方預告", refreshHKO:"重新讀取官方資料", officialChecking:"正在讀取天文台即時資料…", officialNoOutlook:"天文台暫未公布改掛、維持或取消信號的具體時段。", officialUnavailable:"未能取得即時官方公告", officialSource:"資料來源：香港天文台 Open Data", officialLastSuccess:"上次成功取得"
+    appTitle:"🌪 香港颱風智能分析 V16.7", subtitle:"香港天文台官方狀態＋Google AI 集合模式篩選 · AI 數值並非天文台發出信號的機率", languageLabel:"語言", stormDashboard:"🌀 風暴儀表板", officialHKO:"🏛 香港天文台官方資料", currentSignal:"現時信號", lastUpdate:"最後更新", worstMember:"最接近香港的預測路徑", worstType:"該路徑預測的最高強度", closestPosition:"最接近香港時位置", trackDirection:"整體移動方向", memberPeakWind:"該路徑最高風速", memberLowestPressure:"該路徑最低氣壓", uploadAuto:"📂 上載／自動下載", uploadCSV:"上載 FNV3 集合模式 CSV", analyzeButton:"分析香港颱風風險", downloadButton:"自動下載最新 Google CSV", aiEstimateOnly:"Google WeatherNext FNV3 集合模式 · 只屬 AI 推算。", aiSupportTitle:"🚦 香港影響篩選結果", supportDisclaimer:"以下百分比只代表符合內部篩選條件的模式成員比例，並非香港天文台發出相應信號的機率。", interpretationTitle:"🧭 AI 人話解讀", statusLabel:"狀態：", screeningLevel:"香港廣域影響篩選：", t1Support:"一號戒備信號相似條件支持度（非發出機率）", t3Support:"T3 類似情景支持度", t8Support:"T8 類似風場支持度", t9Support:"T9 類似風場支持度", t10Support:"T10 類似風場支持度", ensembleStats:"📊 集合模式統計", scenarioWindow:"AI 情景時段（UTC）", minimumDistance:"最低情景距離", minimumTime:"最低距離時間（UTC）", strongestWind:"所有預測路徑最高風速", lowestPressure:"所有預測路徑最低氣壓", membersRows:"預測路徑數／資料行數", distanceDistribution:"📏 距離分布", distancePercentiles:"📈 距離百分位", riskExplanation:"🧠 風險解釋", topWorst:"🔥 最接近香港的 10 條預測路徑（按距離排序）", shareSummary:"📲 WhatsApp／Telegram 摘要", copySummary:"複製摘要", sendTelegram:"發送 Telegram 警報", waiting:"等待中", loading:"載入中…", analysisComplete:"分析完成", reading:"讀取中…", noSignal:"現時沒有熱帶氣旋警告信號", unavailable:"天文台資料暫時無法取得", copied:"已複製", sent:"Telegram 已發送", telegramWaiting:"Telegram：等待中", telegramReady:"Telegram：可以發送", telegramSending:"Telegram：發送中…", telegramSent:"Telegram：已發送", telegramFailed:"Telegram：發送失敗", googleModelBatch:"Google AI 模型批次", downloadTime:"本次下載時間", loadedFilename:"已載入檔案", plainSummaryTitle:"🧭 主流預測摘要", mainstreamTrack:"代表性主流預測路徑", mainstreamType:"最接近香港時的中位數強度", mainstreamDistance:"最可能最近距離（P50）", reasonableRange:"合理距離範圍（P10–P90）", medianWind:"最接近香港時風速中位數", medianPressure:"最接近香港時氣壓中位數", extremeReference:"⚠️ 極端情景參考", extremeTrack:"最接近的離群路徑", extremeDistance:"極端最近距離", extremeWind:"極端路徑最近香港時風速", extremePressure:"極端路徑最近香港時氣壓", extremeDisclaimer:"此為離群極端情景，並非最可能預測。", trendTitle:"📉 模型輪次趨勢", dataFreshness:"資料新鮮度", previousRun:"上一個模型批次", lifecycleReference:"🧪 生命週期峰值參考", lifecycleMedianWind:"生命週期最高風速中位數", lifecycleMedianPressure:"生命週期最低氣壓中位數", extremeLifecycleWind:"極端路徑生命週期最高風速", extremeLifecyclePressure:"極端路徑生命週期最低氣壓", lifecycleDisclaimer:"以上峰值可能出現在遠離香港位置，只供技術參考。", p50Label:"P50 中位距離", p10Label:"P10 較接近情景", p01Label:"P01 少數極端情景", topWorstDisclaimer:"只按最接近香港的距離排序，不代表發生機率或最可能路徑。", officialOutlookTitle:"📢 天文台官方預告", refreshHKO:"重新讀取官方資料", officialChecking:"正在讀取天文台即時資料…", officialNoOutlook:"天文台暫未公布改掛、維持或取消信號的具體時段。", officialUnavailable:"未能取得即時官方公告", officialSource:"資料來源：香港天文台 Open Data", officialLastSuccess:"上次成功取得"
   },
   en: {
-    appTitle:"🌪 HK Typhoon Intelligence V16.5", subtitle:"Official HKO status + Google AI ensemble screening · AI values are not HKO signal probabilities", languageLabel:"Language", stormDashboard:"🌀 Storm Dashboard", officialHKO:"🏛 Official HKO", currentSignal:"Current Signal", lastUpdate:"Last Update", worstMember:"Closest Forecast Track", worstType:"Peak Intensity on This Track", closestPosition:"Position at Closest Approach", trackDirection:"Overall Track Direction", memberPeakWind:"Track Peak Wind", memberLowestPressure:"Track Lowest Pressure", uploadAuto:"📂 Upload / Auto Download", uploadCSV:"Upload FNV3 Ensemble CSV", analyzeButton:"Analyze HK Typhoon Risk", downloadButton:"Auto Download Latest Google CSV", aiEstimateOnly:"Google WeatherNext FNV3 Ensemble · AI estimate only.", aiSupportTitle:"🚦 Hong Kong Impact Screening", supportDisclaimer:"These percentages show how many model members meet internal screening conditions. They are not the probability that HKO will issue a signal.", interpretationTitle:"🧭 AI Interpretation Summary", statusLabel:"Status:", screeningLevel:"Broad Hong Kong Impact Screening:", t1Support:"Broad HK-impact Screening Hit Rate", t3Support:"T3-like Scenario Support", t8Support:"T8-like Wind-field Support", t9Support:"T9-like Wind-field Support", t10Support:"T10-like Wind-field Support", ensembleStats:"📊 Ensemble Statistics", scenarioWindow:"AI Scenario Window (UTC)", minimumDistance:"Minimum Scenario Distance", minimumTime:"Minimum-distance Time (UTC)", strongestWind:"Strongest Track Wind", lowestPressure:"Lowest Track Pressure", membersRows:"Forecast Tracks / Rows", distanceDistribution:"📏 Distance Distribution", distancePercentiles:"📈 Distance Percentiles", riskExplanation:"🧠 Risk Explanation", topWorst:"🔥 10 Closest Forecast Tracks (Distance-ranked)", shareSummary:"📲 WhatsApp / Telegram Summary", copySummary:"Copy Summary", sendTelegram:"Send Telegram Alert", waiting:"Waiting", loading:"Loading...", analysisComplete:"Analysis Complete", reading:"Reading...", noSignal:"No Tropical Cyclone Signal", unavailable:"HKO data unavailable", copied:"Copied", sent:"Telegram sent", telegramWaiting:"Telegram: Waiting", telegramReady:"Telegram: Ready to send", telegramSending:"Telegram: Sending...", telegramSent:"Telegram: Sent", telegramFailed:"Telegram: Failed", googleModelBatch:"Google AI Model Batch", downloadTime:"Download Time", loadedFilename:"Loaded File", plainSummaryTitle:"🧭 Main Forecast Summary", mainstreamTrack:"Representative Mainstream Track", mainstreamType:"Median Intensity at Closest Approach", mainstreamDistance:"Most Likely Closest Distance (P50)", reasonableRange:"Reasonable Distance Range (P10–P90)", medianWind:"Median Wind at Closest Approach", medianPressure:"Median Pressure at Closest Approach", extremeReference:"⚠️ Extreme Scenario Reference", extremeTrack:"Closest Outlier Track", extremeDistance:"Extreme Closest Distance", extremeWind:"Wind at Extreme Closest Approach", extremePressure:"Pressure at Extreme Closest Approach", extremeDisclaimer:"This is an outlier extreme scenario, not the most likely forecast.", trendTitle:"📉 Run-to-run Trend", dataFreshness:"Data Freshness", previousRun:"Previous Model Run", lifecycleReference:"🧪 Lifecycle Peak Reference", lifecycleMedianWind:"Lifecycle Peak Wind Median", lifecycleMedianPressure:"Lifecycle Minimum Pressure Median", extremeLifecycleWind:"Extreme Track Lifecycle Peak Wind", extremeLifecyclePressure:"Extreme Track Lifecycle Minimum Pressure", lifecycleDisclaimer:"These peak values may occur far from Hong Kong and are for technical reference only.", p50Label:"P50 Median Distance", p10Label:"P10 Closer Scenario", p01Label:"P01 Rare Extreme Scenario", topWorstDisclaimer:"Ranked only by closest distance to Hong Kong; this is not a probability or likelihood ranking.", officialOutlookTitle:"📢 HKO Official Outlook", refreshHKO:"Refresh official data", officialChecking:"Fetching live HKO data…", officialNoOutlook:"HKO has not announced a specific time window for changing, maintaining or cancelling the signal.", officialUnavailable:"Unable to retrieve live official announcement", officialSource:"Source: Hong Kong Observatory Open Data", officialLastSuccess:"Last successful retrieval"
+    appTitle:"🌪 HK Typhoon Intelligence V16.7", subtitle:"Official HKO status + Google AI ensemble screening · AI values are not HKO signal probabilities", languageLabel:"Language", stormDashboard:"🌀 Storm Dashboard", officialHKO:"🏛 Official HKO", currentSignal:"Current Signal", lastUpdate:"Last Update", worstMember:"Closest Forecast Track", worstType:"Peak Intensity on This Track", closestPosition:"Position at Closest Approach", trackDirection:"Overall Track Direction", memberPeakWind:"Track Peak Wind", memberLowestPressure:"Track Lowest Pressure", uploadAuto:"📂 Upload / Auto Download", uploadCSV:"Upload FNV3 Ensemble CSV", analyzeButton:"Analyze HK Typhoon Risk", downloadButton:"Auto Download Latest Google CSV", aiEstimateOnly:"Google WeatherNext FNV3 Ensemble · AI estimate only.", aiSupportTitle:"🚦 Hong Kong Impact Screening", supportDisclaimer:"These percentages show how many model members meet internal screening conditions. They are not the probability that HKO will issue a signal.", interpretationTitle:"🧭 AI Interpretation Summary", statusLabel:"Status:", screeningLevel:"Broad Hong Kong Impact Screening:", t1Support:"T1-like Screening Support (not issue probability)", t3Support:"T3-like Scenario Support", t8Support:"T8-like Wind-field Support", t9Support:"T9-like Wind-field Support", t10Support:"T10-like Wind-field Support", ensembleStats:"📊 Ensemble Statistics", scenarioWindow:"AI Scenario Window (UTC)", minimumDistance:"Minimum Scenario Distance", minimumTime:"Minimum-distance Time (UTC)", strongestWind:"Strongest Track Wind", lowestPressure:"Lowest Track Pressure", membersRows:"Forecast Tracks / Rows", distanceDistribution:"📏 Distance Distribution", distancePercentiles:"📈 Distance Percentiles", riskExplanation:"🧠 Risk Explanation", topWorst:"🔥 10 Closest Forecast Tracks (Distance-ranked)", shareSummary:"📲 WhatsApp / Telegram Summary", copySummary:"Copy Summary", sendTelegram:"Send Telegram Alert", waiting:"Waiting", loading:"Loading...", analysisComplete:"Analysis Complete", reading:"Reading...", noSignal:"No Tropical Cyclone Signal", unavailable:"HKO data unavailable", copied:"Copied", sent:"Telegram sent", telegramWaiting:"Telegram: Waiting", telegramReady:"Telegram: Ready to send", telegramSending:"Telegram: Sending...", telegramSent:"Telegram: Sent", telegramFailed:"Telegram: Failed", googleModelBatch:"Google AI Model Batch", downloadTime:"Download Time", loadedFilename:"Loaded File", plainSummaryTitle:"🧭 Main Forecast Summary", mainstreamTrack:"Representative Mainstream Track", mainstreamType:"Median Intensity at Closest Approach", mainstreamDistance:"Most Likely Closest Distance (P50)", reasonableRange:"Reasonable Distance Range (P10–P90)", medianWind:"Median Wind at Closest Approach", medianPressure:"Median Pressure at Closest Approach", extremeReference:"⚠️ Extreme Scenario Reference", extremeTrack:"Closest Outlier Track", extremeDistance:"Extreme Closest Distance", extremeWind:"Wind at Extreme Closest Approach", extremePressure:"Pressure at Extreme Closest Approach", extremeDisclaimer:"This is an outlier extreme scenario, not the most likely forecast.", trendTitle:"📉 Run-to-run Trend", dataFreshness:"Data Freshness", previousRun:"Previous Model Run", lifecycleReference:"🧪 Lifecycle Peak Reference", lifecycleMedianWind:"Lifecycle Peak Wind Median", lifecycleMedianPressure:"Lifecycle Minimum Pressure Median", extremeLifecycleWind:"Extreme Track Lifecycle Peak Wind", extremeLifecyclePressure:"Extreme Track Lifecycle Minimum Pressure", lifecycleDisclaimer:"These peak values may occur far from Hong Kong and are for technical reference only.", p50Label:"P50 Median Distance", p10Label:"P10 Closer Scenario", p01Label:"P01 Rare Extreme Scenario", topWorstDisclaimer:"Ranked only by closest distance to Hong Kong; this is not a probability or likelihood ranking.", officialOutlookTitle:"📢 HKO Official Outlook", refreshHKO:"Refresh official data", officialChecking:"Fetching live HKO data…", officialNoOutlook:"HKO has not announced a specific time window for changing, maintaining or cancelling the signal.", officialUnavailable:"Unable to retrieve live official announcement", officialSource:"Source: Hong Kong Observatory Open Data", officialLastSuccess:"Last successful retrieval"
   },
   ja: {
-    appTitle:"🌪 香港台風インテリジェンス V16.5", subtitle:"香港天文台の公式状況＋Google AIアンサンブル分析 · AI数値は警報発令確率ではありません", languageLabel:"言語", stormDashboard:"🌀 台風ダッシュボード", officialHKO:"🏛 香港天文台 公式情報", currentSignal:"現在のシグナル", lastUpdate:"最終更新", worstMember:"香港に最も接近する予測経路", worstType:"この経路の最大強度", closestPosition:"最接近時の位置", trackDirection:"全体の進行方向", memberPeakWind:"経路の最大風速", memberLowestPressure:"経路の最低気圧", uploadAuto:"📂 アップロード／自動ダウンロード", uploadCSV:"FNV3 アンサンブルCSVをアップロード", analyzeButton:"香港への台風リスクを分析", downloadButton:"最新Google CSVを自動ダウンロード", aiEstimateOnly:"Google WeatherNext FNV3 アンサンブル · AI推定のみ。", aiSupportTitle:"🚦 香港影響スクリーニング", supportDisclaimer:"各割合は内部条件を満たすモデルメンバーの比率です。香港天文台が警報を発令する確率ではありません。", interpretationTitle:"🧭 AI解釈サマリー", statusLabel:"状態：", screeningLevel:"香港広域影響スクリーニング：", t1Support:"広域香港影響条件の該当率", t3Support:"T3相当シナリオ支持率", t8Support:"T8相当風域支持率", t9Support:"T9相当風域支持率", t10Support:"T10相当風域支持率", ensembleStats:"📊 アンサンブル統計", scenarioWindow:"AIシナリオ期間（UTC）", minimumDistance:"最小シナリオ距離", minimumTime:"最小距離の時刻（UTC）", strongestWind:"全予測経路の最大風速", lowestPressure:"全予測経路の最低気圧", membersRows:"予測経路数／行数", distanceDistribution:"📏 距離分布", distancePercentiles:"📈 距離パーセンタイル", riskExplanation:"🧠 リスク説明", topWorst:"🔥 香港に最も接近する10経路（距離順）", shareSummary:"📲 WhatsApp／Telegram 要約", copySummary:"要約をコピー", sendTelegram:"Telegram警報を送信", waiting:"待機中", loading:"読み込み中…", analysisComplete:"分析完了", reading:"読み込み中…", noSignal:"熱帯低気圧警報シグナルなし", unavailable:"香港天文台データを取得できません", copied:"コピーしました", sent:"Telegramを送信しました", telegramWaiting:"Telegram：待機中", telegramReady:"Telegram：送信可能", telegramSending:"Telegram：送信中…", telegramSent:"Telegram：送信済み", telegramFailed:"Telegram：送信失敗", googleModelBatch:"Google AIモデル実行時刻", downloadTime:"ダウンロード時刻", loadedFilename:"読み込み済みファイル", plainSummaryTitle:"🧭 主流予測サマリー", mainstreamTrack:"代表的な主流予測経路", mainstreamType:"香港最接近時の強度中央値", mainstreamDistance:"最も可能性の高い最接近距離（P50）", reasonableRange:"妥当な距離範囲（P10～P90）", medianWind:"香港最接近時の風速中央値", medianPressure:"香港最接近時の気圧中央値", extremeReference:"⚠️ 極端シナリオ参考", extremeTrack:"最接近の外れ値経路", extremeDistance:"極端な最接近距離", extremeWind:"極端経路の香港最接近時風速", extremePressure:"極端経路の香港最接近時気圧", extremeDisclaimer:"これは外れ値の極端シナリオであり、最も可能性の高い予測ではありません。", trendTitle:"📉 モデル実行間の傾向", dataFreshness:"データ鮮度", previousRun:"前回モデル実行", lifecycleReference:"🧪 ライフサイクル極値参考", lifecycleMedianWind:"ライフサイクル最大風速中央値", lifecycleMedianPressure:"ライフサイクル最低気圧中央値", extremeLifecycleWind:"極端経路のライフサイクル最大風速", extremeLifecyclePressure:"極端経路のライフサイクル最低気圧", lifecycleDisclaimer:"これらの極値は香港から遠い場所で発生する可能性があり、技術参考用です。", p50Label:"P50 中央距離", p10Label:"P10 接近寄りシナリオ", p01Label:"P01 稀な極端シナリオ", topWorstDisclaimer:"香港への最接近距離だけで並べたもので、発生確率や可能性の順位ではありません。", officialOutlookTitle:"📢 香港天文台 公式見通し", refreshHKO:"公式データを再取得", officialChecking:"香港天文台のライブデータを取得中…", officialNoOutlook:"香港天文台はシグナル変更・維持・解除の具体的時刻をまだ発表していません。", officialUnavailable:"公式発表を取得できません", officialSource:"出典：香港天文台オープンデータ", officialLastSuccess:"前回取得成功"
+    appTitle:"🌪 香港台風インテリジェンス V16.7", subtitle:"香港天文台の公式状況＋Google AIアンサンブル分析 · AI数値は警報発令確率ではありません", languageLabel:"言語", stormDashboard:"🌀 台風ダッシュボード", officialHKO:"🏛 香港天文台 公式情報", currentSignal:"現在のシグナル", lastUpdate:"最終更新", worstMember:"香港に最も接近する予測経路", worstType:"この経路の最大強度", closestPosition:"最接近時の位置", trackDirection:"全体の進行方向", memberPeakWind:"経路の最大風速", memberLowestPressure:"経路の最低気圧", uploadAuto:"📂 アップロード／自動ダウンロード", uploadCSV:"FNV3 アンサンブルCSVをアップロード", analyzeButton:"香港への台風リスクを分析", downloadButton:"最新Google CSVを自動ダウンロード", aiEstimateOnly:"Google WeatherNext FNV3 アンサンブル · AI推定のみ。", aiSupportTitle:"🚦 香港影響スクリーニング", supportDisclaimer:"各割合は内部条件を満たすモデルメンバーの比率です。香港天文台が警報を発令する確率ではありません。", interpretationTitle:"🧭 AI解釈サマリー", statusLabel:"状態：", screeningLevel:"香港広域影響スクリーニング：", t1Support:"T1類似条件の支持率（発令確率ではありません）", t3Support:"T3相当シナリオ支持率", t8Support:"T8相当風域支持率", t9Support:"T9相当風域支持率", t10Support:"T10相当風域支持率", ensembleStats:"📊 アンサンブル統計", scenarioWindow:"AIシナリオ期間（UTC）", minimumDistance:"最小シナリオ距離", minimumTime:"最小距離の時刻（UTC）", strongestWind:"全予測経路の最大風速", lowestPressure:"全予測経路の最低気圧", membersRows:"予測経路数／行数", distanceDistribution:"📏 距離分布", distancePercentiles:"📈 距離パーセンタイル", riskExplanation:"🧠 リスク説明", topWorst:"🔥 香港に最も接近する10経路（距離順）", shareSummary:"📲 WhatsApp／Telegram 要約", copySummary:"要約をコピー", sendTelegram:"Telegram警報を送信", waiting:"待機中", loading:"読み込み中…", analysisComplete:"分析完了", reading:"読み込み中…", noSignal:"熱帯低気圧警報シグナルなし", unavailable:"香港天文台データを取得できません", copied:"コピーしました", sent:"Telegramを送信しました", telegramWaiting:"Telegram：待機中", telegramReady:"Telegram：送信可能", telegramSending:"Telegram：送信中…", telegramSent:"Telegram：送信済み", telegramFailed:"Telegram：送信失敗", googleModelBatch:"Google AIモデル実行時刻", downloadTime:"ダウンロード時刻", loadedFilename:"読み込み済みファイル", plainSummaryTitle:"🧭 主流予測サマリー", mainstreamTrack:"代表的な主流予測経路", mainstreamType:"香港最接近時の強度中央値", mainstreamDistance:"最も可能性の高い最接近距離（P50）", reasonableRange:"妥当な距離範囲（P10～P90）", medianWind:"香港最接近時の風速中央値", medianPressure:"香港最接近時の気圧中央値", extremeReference:"⚠️ 極端シナリオ参考", extremeTrack:"最接近の外れ値経路", extremeDistance:"極端な最接近距離", extremeWind:"極端経路の香港最接近時風速", extremePressure:"極端経路の香港最接近時気圧", extremeDisclaimer:"これは外れ値の極端シナリオであり、最も可能性の高い予測ではありません。", trendTitle:"📉 モデル実行間の傾向", dataFreshness:"データ鮮度", previousRun:"前回モデル実行", lifecycleReference:"🧪 ライフサイクル極値参考", lifecycleMedianWind:"ライフサイクル最大風速中央値", lifecycleMedianPressure:"ライフサイクル最低気圧中央値", extremeLifecycleWind:"極端経路のライフサイクル最大風速", extremeLifecyclePressure:"極端経路のライフサイクル最低気圧", lifecycleDisclaimer:"これらの極値は香港から遠い場所で発生する可能性があり、技術参考用です。", p50Label:"P50 中央距離", p10Label:"P10 接近寄りシナリオ", p01Label:"P01 稀な極端シナリオ", topWorstDisclaimer:"香港への最接近距離だけで並べたもので、発生確率や可能性の順位ではありません。", officialOutlookTitle:"📢 香港天文台 公式見通し", refreshHKO:"公式データを再取得", officialChecking:"香港天文台のライブデータを取得中…", officialNoOutlook:"香港天文台はシグナル変更・維持・解除の具体的時刻をまだ発表していません。", officialUnavailable:"公式発表を取得できません", officialSource:"出典：香港天文台オープンデータ", officialLastSuccess:"前回取得成功"
   }
 };
 let currentLang = localStorage.getItem("typhoonLanguage") || "zh-HK";
@@ -2537,7 +2580,7 @@ function buildPointPopup(point, track){
     </div>`;
 }
 
-function renderTyphoonMap(tracks,representativeTrack,extremeTrack){setTimeout(()=>{initTyphoonMap();if(!typhoonMap)return;clearDynamicMapLayers();const clean=(tracks||[]).map(t=>({...t,points:safePoints(t)})).filter(t=>t.points.length>=2);window.latestMapTracks=clean;window.latestRepresentativeTrack=representativeTrack;window.latestExtremeTrack=extremeTrack;mapTimeline=buildSmoothTimeline(clean);const s=document.getElementById("mapTimeSlider");s.max=Math.max(0,mapTimeline.length-1);s.value=0;document.getElementById("mapTrackCount").innerText=clean.length.toLocaleString();const playBtn=document.getElementById("mapPlayBtn");if(playBtn){playBtn.disabled=mapTimeline.length<2;playBtn.innerText=mapTimeline.length<2?"等待資料":"▶ 播放";}const canvas=L.canvas({padding:.4});clean.slice(0,500).forEach((t,i)=>L.polyline(t.points.map(p=>[p.lat,p.lon]),{color:i%4===0?"#38bdf8":"#64748b",weight:i%4===0?1.1:.8,opacity:i%4===0?.24:.11,renderer:canvas,interactive:false,smoothFactor:1}).addTo(mapGroups.ensemble));if(!mapLayerState.ensemble&&typhoonMap.hasLayer(mapGroups.ensemble))typhoonMap.removeLayer(mapGroups.ensemble);const rep=safePoints(representativeTrack).map(p=>[p.lat,p.lon]),ext=safePoints(extremeTrack).map(p=>[p.lat,p.lon]);if(rep.length>=2){
+function renderTyphoonMap(tracks,representativeTrack,extremeTrack){waitForLeaflet(()=>{setTimeout(()=>{initTyphoonMap();if(!typhoonMap)return;clearDynamicMapLayers();const clean=(tracks||[]).map(t=>({...t,points:safePoints(t)})).filter(t=>t.points.length>=2);window.latestMapTracks=clean;window.latestRepresentativeTrack=representativeTrack;window.latestExtremeTrack=extremeTrack;mapTimeline=buildSmoothTimeline(clean);const s=document.getElementById("mapTimeSlider");s.max=Math.max(0,mapTimeline.length-1);s.value=0;document.getElementById("mapTrackCount").innerText=clean.length.toLocaleString();const playBtn=document.getElementById("mapPlayBtn");if(playBtn){playBtn.disabled=mapTimeline.length<2;playBtn.innerText=mapTimeline.length<2?"等待資料":"▶ 播放";}const canvas=L.canvas({padding:.4});clean.slice(0,500).forEach((t,i)=>L.polyline(t.points.map(p=>[p.lat,p.lon]),{color:i%4===0?"#38bdf8":"#64748b",weight:i%4===0?1.1:.8,opacity:i%4===0?.24:.11,renderer:canvas,interactive:false,smoothFactor:1}).addTo(mapGroups.ensemble));if(!mapLayerState.ensemble&&typhoonMap.hasLayer(mapGroups.ensemble))typhoonMap.removeLayer(mapGroups.ensemble);const rep=safePoints(representativeTrack).map(p=>[p.lat,p.lon]),ext=safePoints(extremeTrack).map(p=>[p.lat,p.lon]);if(rep.length<2){if(playBtn){playBtn.disabled=true;playBtn.innerText="沒有可播放路徑";}document.getElementById("mapTimeLabel").innerText="沒有可播放路徑";}if(rep.length>=2){
       L.polyline(rep,{color:"#22c55e",weight:4,opacity:.96}).addTo(mapGroups.highlights);
 
       const repTrackPoints = safePoints(representativeTrack);
@@ -2556,7 +2599,7 @@ function renderTyphoonMap(tracks,representativeTrack,extremeTrack){setTimeout(()
           .addTo(mapGroups.markers)
           .bindPopup(buildPointPopup(p, representativeTrack));
       });
-    }if(ext.length>=2&&mapLayerState.extreme)L.polyline(ext,{color:"#b45309",weight:2,opacity:.5,dashArray:"6 8"}).addTo(mapGroups.highlights);animatedRepLine=L.polyline([],{color:"#86efac",weight:6,opacity:.98}).addTo(mapGroups.highlights);animatedExtremeLine=L.polyline([],{color:"#b45309",weight:2,opacity:.55,dashArray:"6 8"});if(mapLayerState.extreme)animatedExtremeLine.addTo(mapGroups.highlights);const pts=[];clean.slice(0,200).forEach(t=>t.points.forEach(p=>pts.push([p.lat,p.lon])));if(pts.length)typhoonMap.fitBounds(L.latLngBounds(pts),{padding:[34,34],maxZoom:6,animate:false});else typhoonMap.setView([20.5,119],5);setMapFrame(0);setTimeout(()=>typhoonMap.invalidateSize(),120)},120)}
+    }if(ext.length>=2&&mapLayerState.extreme)L.polyline(ext,{color:"#b45309",weight:2,opacity:.5,dashArray:"6 8"}).addTo(mapGroups.highlights);animatedRepLine=L.polyline([],{color:"#86efac",weight:6,opacity:.98}).addTo(mapGroups.highlights);animatedExtremeLine=L.polyline([],{color:"#b45309",weight:2,opacity:.55,dashArray:"6 8"});if(mapLayerState.extreme)animatedExtremeLine.addTo(mapGroups.highlights);const pts=[];clean.slice(0,200).forEach(t=>t.points.forEach(p=>pts.push([p.lat,p.lon])));if(pts.length)typhoonMap.fitBounds(L.latLngBounds(pts),{padding:[34,34],maxZoom:6,animate:false});else typhoonMap.setView([20.5,119],5);setMapFrame(0);setTimeout(()=>typhoonMap.invalidateSize(),120)},120)})}
 function setMapFrame(index){if(!mapTimeline.length||!typhoonMap)return;mapFrame=Math.max(0,Math.min(index,mapTimeline.length-1));document.getElementById("mapTimeSlider").value=mapFrame;const time=mapTimeline[mapFrame],d=new Date(time);document.getElementById("mapTimeLabel").innerText=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Hong_Kong",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}).format(d)+" HKT";const rep=pointAtTime(window.latestRepresentativeTrack,time),ext=pointAtTime(window.latestExtremeTrack,time);animatedRepLine?.setLatLngs(safePoints(window.latestRepresentativeTrack).filter(p=>p._t<=d.getTime()).map(p=>[p.lat,p.lon]));animatedExtremeLine?.setLatLngs(safePoints(window.latestExtremeTrack).filter(p=>p._t<=d.getTime()).map(p=>[p.lat,p.lon]));if(rep){if(!repMarker)repMarker=L.circleMarker([rep.lat,rep.lon],{radius:7,color:"#fff",weight:2,fillColor:"#22c55e",fillOpacity:1}).addTo(mapGroups.markers);else repMarker.setLatLng([rep.lat,rep.lon]);const movingIdentity=resolveStormIdentity(rep,window.latestRepresentativeTrack);if(!repLabel){repLabel=L.tooltip({permanent:true,direction:"top",offset:[0,-12],className:"stormMovingLabel"}).setLatLng([rep.lat,rep.lon]).setContent(`${movingIdentity.name}｜${movingIdentity.type}`).addTo(mapGroups.markers);}else{repLabel.setLatLng([rep.lat,rep.lon]).setContent(`${movingIdentity.name}｜${movingIdentity.type}`);}document.getElementById("mapRepWind").innerText=isFinite(rep.wind)?Number(rep.wind).toFixed(1)+" kt":"—";document.getElementById("mapRepPressure").innerText=isFinite(rep.pressure)?Number(rep.pressure).toFixed(1)+" hPa":"—";document.getElementById("mapRepDistance").innerText=haversineKm(MAP_HK_LAT,MAP_HK_LON,rep.lat,rep.lon).toFixed(0)+" km";
     const identity=resolveStormIdentity(rep,window.latestRepresentativeTrack);
     document.getElementById("mapStormName").innerText=identity.name;
@@ -3007,6 +3050,33 @@ async function loadHKOStatus(manualRefresh=false){
   }
 }
 
+
+const MAX_CURRENT_MODEL_AGE_HOURS = 30;
+
+function waitForLeaflet(callback, attempt=0){
+  if(typeof L !== "undefined") return callback();
+  if(attempt >= 50){ console.error("Leaflet failed to load"); return; }
+  setTimeout(()=>waitForLeaflet(callback,attempt+1),200);
+}
+
+function clearCurrentForecastDisplay(message){
+  const dash="—";
+  const ids=["stormName","stormType","stormPos","stormMove","stormWind","stormPressure","extremeTrack","extremeDistance","extremeWind","extremePressure","lifecycleMedianWind","lifecycleMedianPressure","extremeLifecycleWind","extremeLifecyclePressure","overall","t1","t3","t8","t9","t10","window","closest","ctime","wind","pressure","tracks","rows","d200","d400","d800","d999","p50","p10","p01"];
+  ids.forEach(id=>{const el=document.getElementById(id);if(el)el.innerText=["tracks","rows"].includes(id)?"0":dash;});
+  ["bar200","bar400","bar800","bar999"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.width="0%";});
+  const main=document.getElementById("plainSummaryMain");if(main)main.innerText=message;
+  const detail=document.getElementById("plainSummaryDetail");if(detail)detail.innerText="系統不會用過期模型批次當作現時預測。";
+  const im=document.getElementById("interpretationMain");if(im)im.innerText=message;
+  const id=document.getElementById("interpretationDetail");if(id)id.innerText="請等候 Google 發布新一輪模型資料。";
+  const status=document.getElementById("status");if(status){status.innerText=message;status.dataset.state="waiting";}
+  const mt=document.getElementById("mapTimeLabel");if(mt)mt.innerText="沒有最新模型資料";
+  const pb=document.getElementById("mapPlayBtn");if(pb){pb.disabled=true;pb.innerText="等待最新資料";}
+  ["mapRepWind","mapRepPressure","mapRepDistance","mapTrackCount","mapStormName","mapStormType"].forEach(id=>{const el=document.getElementById(id);if(el)el.innerText=dash;});
+  mapTimeline=[];
+  if(mapTimer){clearInterval(mapTimer);mapTimer=null;}
+  waitForLeaflet(()=>{initTyphoonMap();if(typhoonMap){clearDynamicMapLayers();setTimeout(()=>typhoonMap.invalidateSize(),100);}});
+}
+
 window.addEventListener("DOMContentLoaded", ()=>{
   setLanguage(currentLang);
 
@@ -3036,6 +3106,7 @@ async function loadLatestGoogleCSV(){
   }
 
   googleAutoLoadRunning = true;
+  window.autoCsvText = null;
 
   const statusEl =
     document.getElementById("status");
@@ -3088,8 +3159,8 @@ async function loadLatestGoogleCSV(){
           h,0,0
         ));
 
-      if(cycleTime <= availabilityCutoff){
-
+      const ageHours = (Date.now() - cycleTime.getTime()) / 3600000;
+      if(cycleTime <= availabilityCutoff && ageHours <= MAX_CURRENT_MODEL_AGE_HOURS){
         candidates.push({
           url: makeUrl(cycleTime,h),
           cycleTime
@@ -3102,6 +3173,11 @@ async function loadLatestGoogleCSV(){
     (a,b) =>
       b.cycleTime - a.cycleTime
   );
+
+  if(candidates.length===0){
+    clearCurrentForecastDisplay("暫時未有最新 Google 模型資料");
+    return;
+  }
 
   const tried = [];
 
@@ -3179,6 +3255,12 @@ async function loadLatestGoogleCSV(){
           " => invalid CSV"
         );
 
+        continue;
+      }
+
+      const modelAgeHours=(Date.now()-item.cycleTime.getTime())/3600000;
+      if(modelAgeHours>MAX_CURRENT_MODEL_AGE_HOURS){
+        tried.push(filename+" => stale model run ("+modelAgeHours.toFixed(1)+"h old)");
         continue;
       }
 
